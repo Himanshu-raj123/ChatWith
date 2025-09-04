@@ -1,0 +1,115 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+/* ====== Reset some defaults ====== */
+* {
+   margin: 0;
+   padding: 0;
+   box-sizing: border-box;
+   font-family: 'Poppins', sans-serif;
+}
+
+/* ====== Page background ====== */
+body {
+   height: 100vh;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   background: url('https://media.istockphoto.com/id/1281150061/vector/register-account-submit-access-login-password-username-internet-online-website-concept.jpg?s=612x612&w=0&k=20&c=9HWSuA9IaU4o-CK6fALBS5eaO1ubnsM08EOYwgbwGBo=') no-repeat center center fixed;
+   background-size: cover;
+   background-attachment: fixed;
+   color: #333;
+}
+
+/* ====== Login Container ====== */
+form {
+   background: #fff;
+   padding: 2rem;
+   border-radius: 12px;
+   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+   width: 100%;
+   max-width: 380px;
+   position: relative;
+}
+
+/* ====== Title ====== */
+h2 {
+   text-align: center;
+   margin-bottom: 1.5rem;
+   color: #543b3b;
+   font-weight: 600;
+}
+
+/* ====== Input Fields ====== */
+input[type="email"],
+input[type="text"],
+input[type="password"] {
+   width: 100%;
+   padding: 0.4rem 0.4rem;
+   margin: 0.2rem 0 0.2rem 0;
+   border: 1px solid #ccc;
+   border-radius: 6px;
+   font-size: 1rem;
+   transition: border-color 0.3s ease;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus {
+   border-color: #2575fc;
+   outline: none;
+   box-shadow: 0 0 6px rgba(37, 117, 252, 0.3);
+}
+
+/* ====== Submit Button ====== */
+input[type="submit"] {
+   width: 100%;
+   padding: 0.5rem;
+   margin-top: 0.5rem;
+   border: none;
+   border-radius: 6px;
+   background: linear-gradient(135deg, #2575fc, #6a11cb);
+   color: white;
+   font-size: 1.1rem;
+   font-weight: bold;
+   cursor: pointer;
+   transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+input[type="submit"]:hover {
+   transform: translateY(-2px);
+   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+}
+
+/* ====== Messages ====== */
+p {
+   text-align: center;
+   margin-top: 1rem;
+   font-size: 0.95rem;
+}
+
+/* Error message */
+p[style*="red"] {
+   color: #e63946 !important;
+   font-weight: 600;
+}
+
+/* Success message */
+p[style*="green"] {
+   color: #2a9d8f !important;
+   font-weight: 600;
+}
+
+/* ====== Signup Link ====== */
+a {
+   display: block;
+   text-align: center;
+   margin-top: 1rem;
+   text-decoration: none;
+   font-size: 0.95rem;
+   color: red;
+   transition: color 0.3s ease;
+}
+
+a:hover {
+   color: #6a11cb;
+   text-decoration: underline;
+}

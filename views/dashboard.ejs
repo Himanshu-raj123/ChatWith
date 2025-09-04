@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>ChatWith</title>
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+   <link rel="stylesheet" href="/dashboard.css">
+</head>
+
+<body>
+   <div id="main">
+      <div id="id1">
+
+         <p id="heading">ChatWith <button><a id="logout" href="/user/logout">Logout</a></p></button>
+
+         <h4>Users Of ChatWith</h4>
+         <span id="chats">
+            <% active.forEach(element=> { %>
+               <div>
+                  <%= element.Email %>
+               </div>
+               <% }) %>
+            </span>
+      </div>
+
+      <div id="id2">
+         <div id="user">
+            <div><i class="fa-solid fa-user"></i> </div>
+            <div>
+               <span id="reciverEmail">
+                  <%= user?.email %>
+               </span><br>
+               <span>(<%= user?.name %>)</span>
+            </div>
+         </div>
+
+         <div id="chat-messages">
+         </div>
+
+         <form id="chat-input">
+            <input type="text" id="messageInput" placeholder="Type a message..." />
+            <button type="submit" id="sendBtn"><i class="fa-solid fa-paper-plane"></i></button>
+         </form>
+
+      </div>
+   </div>
+
+   <script>
+      const loggedInUserEmail = "<%= user?.email %>";
+   </script>
+   <script src="/socket.io/socket.io.js"></script>
+   <script src="/dashboard.js"></script>
+</body>
+
+</html>
