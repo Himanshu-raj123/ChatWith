@@ -17,7 +17,7 @@ app.use(express.static('./static'))
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 
-connectMongodb('mongodb://127.0.0.1:27017/Chatwith')
+connectMongodb(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/Chatwith')
    .then(async (res) => {
       console.log("Mongodb Server Connected Successfully");
       // Fix: Ensure all users have a messages array so array updates ($set, $push) don't crash
@@ -100,8 +100,9 @@ io.on('connection', (socket) => {
 })
 
 
-server.listen(4000, (err) => {
-   console.log(err ? "Error in starting the server" : "Server started at http://localhost:4000/ChatWith")
+const PORT = process.env.PORT || 4000;
+server.listen(PORT, (err) => {
+   console.log(err ? "Error in starting the server" : `Server started at http://localhost:${PORT}/ChatWith`)
 })
 
 module.exports = { io, activeUsers };
