@@ -9,51 +9,68 @@
 
 /* ====== Page background ====== */
 body {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: url("https://i.pinimg.com/736x/b8/8a/b2/b88ab2dccb3fae44f6586b0df154c0b7.jpg") no-repeat center center/cover;
+  background-image: url("https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
   background-attachment: fixed;
-  color: #333;
+  color: #fff;
+  padding: 20px;
 }
 
 /* ====== Login Container ====== */
 form {
-  background: #b6b3b3;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 2.5rem 2rem;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   width: 100%;
-  max-width: 380px;
+  max-width: 400px;
   position: relative;
 }
 
 /* ====== Title ====== */
 h2 {
   text-align: center;
-  margin-bottom: 1.5rem;
-  color: #543b3b;
+  margin-bottom: 2rem;
+  color: #fff;
   font-weight: 600;
+  font-size: 1.8rem;
+  letter-spacing: 1px;
 }
 
 /* ====== Input Fields ====== */
 input[type="email"],
 input[type="password"] {
   width: 100%;
-  padding: 0.4rem 0.4rem;
-  margin: 0.2rem 0 0.2rem 0;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  padding: 0.8rem 1rem;
+  margin: 0.6rem 0 1rem 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  color: #fff;
   font-size: 1rem;
-  transition: border-color 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+input[type="email"]::placeholder,
+input[type="password"]::placeholder {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 input[type="email"]:focus,
 input[type="password"]:focus {
-  border-color: #2575fc;
+  border-color: #fff;
   outline: none;
-  box-shadow: 0 0 6px rgba(37, 117, 252, 0.3);
+  background: rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
 }
 
 /* ====== Submit Button ====== */
@@ -79,35 +96,43 @@ input[type="submit"]:hover {
 /* ====== Messages ====== */
 p {
   text-align: center;
-  margin-top: 1rem;
+  margin-top: 1.2rem;
   font-size: 0.95rem;
+  color: #ddd;
 }
 
 /* Error message */
 p[style*="red"] {
-  color: #e63946 !important;
+  color: #ff6b6b !important;
   font-weight: 600;
+  background: rgba(255, 107, 107, 0.1);
+  padding: 8px;
+  border-radius: 6px;
 }
 
 /* Success message */
 p[style*="green"] {
-  color: #2a9d8f !important;
+  color: #51cf66 !important;
   font-weight: 600;
+  background: rgba(81, 207, 102, 0.1);
+  padding: 8px;
+  border-radius: 6px;
 }
 
 /* ====== Signup Link ====== */
 a {
   display: block;
   text-align: center;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   text-decoration: none;
   font-size: 0.95rem;
-  color: red;
+  color: #4dabf7;
+  font-weight: 500;
   transition: color 0.3s ease;
 }
 
 a:hover {
-  color: #6a11cb;
+  color: #fff;
   text-decoration: underline;
 }
 
