@@ -39,7 +39,7 @@ app.use((req, res, next) => {
 })
 
 
-app.use('/ChatWith', homeRouter);
+app.use('/', homeRouter);
 app.use('/user', userRouter);
 app.use('/message', messageRouter);
 
@@ -102,7 +102,7 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 4000;
 server.listen(PORT, (err) => {
-   console.log(err ? "Error in starting the server" : `Server started at http://localhost:${PORT}/ChatWith`)
+   console.log(err ? "Error in starting the server" : `Server started at http://localhost:${PORT}/`)
 })
 
 module.exports = { io, activeUsers };
