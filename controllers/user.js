@@ -25,6 +25,7 @@ async function handleLogin(req, res) {
       res.redirect('/user/dashboard')
 
    }catch(err){
+      console.error("Login Error:", err);
       return res.render('login',{error:"Server Error",message:""})
    }
 }
@@ -46,6 +47,7 @@ async function handleSignup(req, res) {
          // Duplicate key error
          res.status(409).render('signup', { error: "User already exists", message: "" });
       } else {
+         console.error("Signup Error:", err);
          res.status(500).render('signup', { error: "Internal Server Error", message: "" });
       }
    }
