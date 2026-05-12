@@ -19,8 +19,8 @@ async function handleLogin(req, res) {
          return res.render('login',{error:"Invalid credentials",message:""})
       }
 
-      const token = jwt.sign({ id: user._id, email: user.Email, name: user.Name },"HEllODEVELOPER",{expiresIn:'10d'})
-      res.cookie('jwt',token,{maxAge: 10 * 24 * 60 * 60 * 1000})
+      const token = jwt.sign({ id: user._id, email: user.Email, name: user.Name, role: user.Role }, process.env.JWT_SECRET || "HEllODEVELOPER",{expiresIn:'10d'})
+      res.cookie('jwt',token,{maxAge: 10 * 24 * 60 * 60 * 1000, httpOnly: true})
       req.user = user;
       res.redirect('/user/dashboard')
 
@@ -52,7 +52,14 @@ async function handleSignup(req, res) {
 
 }
 
+async function handleLogout(req,res){
+   
+      res.clearCookie('jwt');  
+      res.redirect("/user/login");  
+}
+
 module.exports={
    handleLogin,
    handleSignup,
+   handleLogout
 }

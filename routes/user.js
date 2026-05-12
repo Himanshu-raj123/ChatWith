@@ -1,34 +1,28 @@
 const express = require('express')
 const path = require('path')
 const router = express.Router();
-const checkLogin =  require('../Auth/logged')
-const checkAuth = require('../Auth/checkAuth')
-const {handleLogin,handleSignup} = require('../controllers/user')
+const { requireAuth, requireGuest, authorizeRoles } = require('../middlewares/auth')
+const {handleLogin,handleSignup,handleLogout} = require('../controllers/user')
 const Users = require('../models/users')
 
 async function FindAllUsers(){
     return (await Users.find());
 }
-
-router.get('/signup',(req,res)=>{
+router.get('/signup',requireGuest,(req,res)=>{
    res.render('signup',{error:"",message:""})
 })
-
-router.get('/login',checkLogin,(req,res)=>{
+router.get('/login',requireGuest,(req,res)=>{
    res.render('login',{error:"",message:""})
 })
-router.post('/login',handleLogin)
+router.post('/login',requireGuest,handleLogin)
 
-router.post('/signup',handleSignup)
+router.post('/signup',requireGuest,handleSignup)
 
-router.get('/dashboard',checkAuth, async(req,res)=>{
+router.get('/dashboard',requireAuth, async(req,res)=>{
    let allUsers = await FindAllUsers();
-   res.render('dashboard',{active:allUsers,user:req.user})
+   res.render('dashboard',{all:allUsers,user:req.user,activeUsers: req.activeUsers})
 })
 
-router.get('/logout',(req,res)=>{
-   res.clearCookie('jwt'); 
-   res.redirect('/user/login')
-})
+router.get('/logout/',requireAuth,handleLogout)
 
 module.exports = router;

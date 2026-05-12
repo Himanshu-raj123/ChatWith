@@ -14,16 +14,33 @@
    <div id="main">
       <div id="id1">
 
-         <p id="heading">ChatWith <button><a id="logout" href="/user/logout">Logout</a></p></button>
+         <div id="heading">
+            <span>ChatWith</span> 
+            <a id="logout" href="/user/logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+         </div>
 
-         <h4>Users Of ChatWith</h4>
-         <span id="chats">
-            <% active.forEach(element=> { %>
-               <div>
-                  <%= element.Email %>
+         <h4 class="section-title">All Users Of ChatWith</h4>
+         <div id="chats">
+            <% all.forEach(element=> { %>
+               <% if (element.Email !== user?.email) { %>
+               <div class="user-card" data-email="<%= element.Email %>" data-name="<%= element.Name %>">
+                  <div class="user-info">
+                     <span class="user-name"><%= element.Name %></span>
+                     <span class="user-email"><%= element.Email %></span>
+                  </div>
+                  <div class="status-indicator" title="Offline"></div>
                </div>
-               <% }) %>
-            </span>
+               <% } %>
+            <% }) %>
+         </div>
+
+         <div id="current-user-info">
+            <i class="fa-solid fa-circle-user"></i>
+            <div class="user-details">
+               <span class="name"><%= user?.name %></span>
+               <span class="email"><%= user?.email %></span>
+            </div>
+         </div>
       </div>
 
       <div id="id2">
