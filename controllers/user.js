@@ -37,7 +37,27 @@ async function handleSignup(req, res) {
       return res.render('signup', { error: "All fields are required", message: "" });
    }
 
+   if (name.trim().length < 3) {
+      return res.render('signup', { error: "Name must be at least 3 characters long", message: "" });
+   }
+
+   // Email format validation
+   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+   if (!emailRegex.test(email)) {
+      return res.render('signup', { error: "Please enter a valid email address", message: "" });
+   }
+
+   // Password length validation (at least 6 characters)
+   if (password.length < 6) {
+      return res.render('signup', { error: "Password must be at least 6 characters long", message: "" });
+   }
+
    try {
+      const existingUser = await Users.findOne({ Email: email });
+      if (existingUser) {
+         return res.status(409).render('signup', { error: "Email is already registered", message: "" });
+      }
+
       const hashedPassword = await bcrypt.hash(password, 12);
       await Users.create({ Name: name, Email: email, Password: hashedPassword });
       res.status(201).render('login', { error: "", message: "Signup successful, please login" });

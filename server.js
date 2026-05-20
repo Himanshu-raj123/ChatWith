@@ -20,7 +20,6 @@ app.use(cookieParser())
 connectMongodb(process.env.MONGO_URL || process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/Chatwith')
    .then(async (res) => {
       console.log("Mongodb Server Connected Successfully");
-      // Fix: Ensure all users have a messages array so array updates ($set, $push) don't crash
       try {
          await User.updateMany({ messages: { $exists: false } }, { $set: { messages: [] } });
       } catch(err) { console.error(err) }
