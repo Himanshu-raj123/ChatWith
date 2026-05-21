@@ -15,30 +15,47 @@
       <div id="id1">
 
          <div id="heading">
-            <span>ChatWith</span> 
+            <span>ChatWith</span>
             <a id="logout" href="/user/logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
          </div>
 
          <h4 class="section-title">All Users Of ChatWith</h4>
          <div id="chats">
-            <% all.forEach(element=> { %>
-               <% if (element.Email !== user?.email) { %>
-               <div class="user-card" data-email="<%= element.Email %>" data-name="<%= element.Name %>">
-                  <div class="user-info">
-                     <span class="user-name"><%= element.Name %></span>
-                     <span class="user-email"><%= element.Email %></span>
-                  </div>
-                  <div class="status-indicator" title="Offline"></div>
+            <div class="user-card" data-email="AI" data-name="Swayam" style="background: linear-gradient(to left, #a4b686, #bd3636, #449e96)">
+               <div class="user-info">
+                  <span class="user-name">
+                     Swayam <i class="fa-solid fa-robot"></i>
+                  </span>
                </div>
-               <% } %>
-            <% }) %>
+            </div>
+            
+            <% all.forEach(element=> { %>
+               <% if (element.Email !==user?.email) { %>
+                  <div class="user-card" data-email="<%= element.Email %>" data-name="<%= element.Name %>">
+                     <div class="user-info">
+                        <span class="user-name">
+                           <%= element.Name %>
+                        </span>
+                        <span class="user-email">
+                           <%= element.Email %>
+                        </span>
+                     </div>
+                     <div class="status-indicator" title="Offline"></div>
+                  </div>
+                  <% } %>
+                     <% }) %>
          </div>
 
+         <!-- logged in user -->
          <div id="current-user-info">
             <i class="fa-solid fa-circle-user"></i>
             <div class="user-details">
-               <span class="name"><%= user?.name %></span>
-               <span class="email"><%= user?.email %></span>
+               <span class="name">
+                  <%= user?.name %>
+               </span>
+               <span class="email">
+                  <%= user?.email || "Ai" %>
+               </span>
             </div>
          </div>
       </div>
@@ -67,6 +84,7 @@
 
    <script>
       const loggedInUserEmail = "<%= user?.email %>";
+      const loggedInUserName = "<%= user?.name %>";
    </script>
    <script src="/socket.io/socket.io.js"></script>
    <script src="/dashboard.js"></script>

@@ -17,7 +17,7 @@ function formatTime(timestamp) {
 }
 
 // Register active user
-socket.emit("active", loggedInUserEmail);
+socket.emit("active", loggedInUserEmail, loggedInUserName);
 
 // Handle sending message
 chatForm.addEventListener('submit', (event) => {
@@ -27,7 +27,7 @@ chatForm.addEventListener('submit', (event) => {
     let selectedEmail = document.getElementById('reciverEmail').innerText;
     socket.emit("privateMessage", inputMessage, loggedInUserEmail, selectedEmail);
 
-    // Show message immediately in sender’s chat box
+    // Show message in sender’s chat box
     let chatbox = document.getElementById('chat-messages');
     let div = document.createElement('div');
     div.setAttribute('class', 'sent');
@@ -86,25 +86,46 @@ socket.on("privateMessage", (msgData) => {
 
 socket.on('ActiveUsers', (actUsers) => {
   activeUSers = actUsers;
+  
+  // Add newly registered active users to the UI dynamically
+  for (let email in activeUSers) {
+    if (email === loggedInUserEmail) continue;
+    if (!document.querySelector(`.user-card[data-email="${email}"]`)) {
+      let card = document.createElement('div');
+      card.className = 'user-card';
+      card.setAttribute('data-email', email);
+      card.setAttribute('data-name', activeUSers[email].name);
+      card.innerHTML = `
+        <div class="user-info">
+          <span class="user-name">${activeUSers[email].name}</span>
+          <span class="user-email">${email}</span>
+        </div>
+        <div class="status-indicator online" title="Online"></div>
+      `;
+      document.getElementById('chats').appendChild(card);
+      setupChatSwitch(card);
+    }
+  }
+
   // Update online indicators for each user card
   const userCards = document.querySelectorAll('.user-card');
   userCards.forEach(card => {
     const email = card.getAttribute('data-email');
     const indicator = card.querySelector('.status-indicator');
-    if (activeUSers[email]) {
-      indicator.classList.add('online');
-      indicator.setAttribute('title', 'Online');
-    } else {
-      indicator.classList.remove('online');
-      indicator.setAttribute('title', 'Offline');
+    if (indicator) {
+      if (activeUSers[email]) {
+        indicator.classList.add('online');
+        indicator.setAttribute('title', 'Online');
+      } else {
+        indicator.classList.remove('online');
+        indicator.setAttribute('title', 'Offline');
+      }
     }
   });
 });
 
-// Switching chats
-let userCards = document.querySelectorAll(".user-card");
-
-userCards.forEach(card => {
+// Switching chats setup
+function setupChatSwitch(card) {
   card.onclick = async () => {
     const selectedEmail = card.getAttribute('data-email');
     const selectedName = card.getAttribute('data-name');
@@ -190,7 +211,10 @@ userCards.forEach(card => {
       }
     });
   };
-});
+}
+
+// Attach click event to all initial user cards
+document.querySelectorAll(".user-card").forEach(setupChatSwitch);
 
 socket.on("messagesSeen", (seenByEmail) => {
   let activeChat = document.getElementById('reciverEmail');

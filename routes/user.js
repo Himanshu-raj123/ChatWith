@@ -3,6 +3,8 @@ const path = require('path')
 const router = express.Router();
 const { requireAuth, requireGuest, authorizeRoles } = require('../middlewares/auth')
 const {handleLogin,handleSignup,handleLogout} = require('../controllers/user')
+const {askGemini} = require('../aiService')
+
 const Users = require('../models/users')
 
 async function FindAllUsers(){
@@ -24,5 +26,23 @@ router.get('/dashboard',requireAuth, async(req,res)=>{
 })
 
 router.get('/logout/',requireAuth,handleLogout)
+
+router.post('/askAi', async (req, res) => {
+  const { sender, recipient, text } = req.body;
+
+  // If the recipient is the AI agent
+  if (recipient === 'AI' || recipient === 'Gemini') {
+    try {
+      const aiReply = await askGemini(text);
+      // Send both user message and AI reply back to frontend
+      return res.json({
+        userMessage: text,
+        aiReply
+      });
+    } catch (err) {
+      return res.status(500).json({ error: 'AI agent error' });
+    }
+  }
+});
 
 module.exports = router;
