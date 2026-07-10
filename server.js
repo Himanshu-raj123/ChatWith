@@ -16,6 +16,7 @@ app.set("views", __dirname + "/views")
 
 app.use(express.static('./static'))
 app.use(express.urlencoded({ extended: true }))
+app.use(express.json())
 app.use(cookieParser())
 
 connectMongodb(process.env.MONGO_URL || process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/Chatwith')

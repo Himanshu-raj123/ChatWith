@@ -26,9 +26,14 @@
                <input type="email" id="email" name="email" placeholder="Enter your email" required autocomplete="email">
             </div>
             
-            <div class="input-group">
+            <div class="input-group" style="position: relative;">
                <label for="password"><i class="fa-solid fa-lock"></i> Password</label>
-               <input type="password" id="password" name="password" placeholder="Enter your password" required>
+               <input type="password" id="password" name="password" placeholder="Enter your password" required style="padding-right: 40px;">
+               <i class="fa-regular fa-eye toggle-password" data-target="password" style="position: absolute; right: 12px; bottom: 12px; cursor: pointer; color: #64748b;"></i>
+            </div>
+            
+            <div class="forgot-link-wrapper" style="margin-top: -8px; margin-bottom: 16px; text-align: right;">
+               <a href="#" id="forgot-password-link" style="font-size: 0.85rem; color: #4f46e5; text-decoration: none; font-weight: 600;">Forgot Password?</a>
             </div>
             
             <% if (error) { %>
@@ -48,8 +53,155 @@
                <p>Don't have an account? <a href="/user/signup">Sign Up here</a></p>
             </div>
          </form>
+
+         <!-- Reset Password Form (Hidden Initially) -->
+         <form id="reset-password-form" style="display: none;">
+            <h2>Reset Password</h2>
+            
+            <div class="input-group">
+               <label for="reset-email"><i class="fa-solid fa-envelope"></i> Email Address</label>
+               <input type="email" id="reset-email" placeholder="Enter your email" required autocomplete="email">
+            </div>
+            
+            <div class="input-group" style="position: relative;">
+               <label for="reset-password"><i class="fa-solid fa-lock"></i> New Password</label>
+               <input type="password" id="reset-password" placeholder="Min. 6 characters" required style="padding-right: 40px;">
+               <i class="fa-regular fa-eye toggle-password" data-target="reset-password" style="position: absolute; right: 12px; bottom: 12px; cursor: pointer; color: #64748b;"></i>
+            </div>
+            
+            <div class="input-group" style="position: relative;">
+               <label for="reset-confirm-password"><i class="fa-solid fa-lock"></i> Confirm New Password</label>
+               <input type="password" id="reset-confirm-password" placeholder="Confirm your password" required style="padding-right: 40px;">
+               <i class="fa-regular fa-eye toggle-password" data-target="reset-confirm-password" style="position: absolute; right: 12px; bottom: 12px; cursor: pointer; color: #64748b;"></i>
+            </div>
+            
+            <div class="message-container"></div>
+                              
+            <button type="submit" class="submit-btn">Reset Password <i class="fa-solid fa-key"></i></button>
+            
+            <div class="form-footer">
+               <p><a href="#" id="back-to-login-link">Back to Login</a></p>
+            </div>
+         </form>
       </div>
    </div>
+
+   <script>
+      const loginForm = document.querySelector('form[action="/user/login"]');
+      const resetForm = document.getElementById('reset-password-form');
+      const forgotLink = document.getElementById('forgot-password-link');
+      const backToLoginLink = document.getElementById('back-to-login-link');
+      
+      forgotLink.addEventListener('click', (e) => {
+         e.preventDefault();
+         loginForm.style.display = 'none';
+         resetForm.style.display = 'block';
+         // Clear fields
+         loginForm.reset();
+      });
+      
+      backToLoginLink.addEventListener('click', (e) => {
+         e.preventDefault();
+         resetForm.style.display = 'none';
+         loginForm.style.display = 'block';
+         // Clear fields and error messages
+         resetForm.reset();
+         const msgContainer = resetForm.querySelector('.message-container');
+         if (msgContainer) msgContainer.innerHTML = '';
+      });
+
+      resetForm.addEventListener('submit', async (e) => {
+         e.preventDefault();
+         const email = document.getElementById('reset-email').value.trim();
+         const password = document.getElementById('reset-password').value;
+         const confirmPassword = document.getElementById('reset-confirm-password').value;
+         const msgContainer = resetForm.querySelector('.message-container');
+         
+         if (!email || !password || !confirmPassword) {
+            showMsg(msgContainer, "All fields are required", "error");
+            return;
+         }
+         
+         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+         if (!emailRegex.test(email)) {
+            showMsg(msgContainer, "Please enter a valid email address", "error");
+            return;
+         }
+         
+         if (password.length < 6) {
+            showMsg(msgContainer, "Password must be at least 6 characters long", "error");
+            return;
+         }
+         
+         if (password !== confirmPassword) {
+            showMsg(msgContainer, "Passwords do not match", "error");
+            return;
+         }
+         
+         try {
+            showMsg(msgContainer, "Resetting password...", "info");
+            const response = await fetch('/user/reset-password', {
+               method: 'POST',
+               headers: {
+                  'Content-Type': 'application/json'
+               },
+               body: JSON.stringify({ email, password, confirmPassword })
+            });
+            
+            const data = await response.json();
+            if (response.ok) {
+               showMsg(msgContainer, "Password reset successfully. You can now log in with your new password.", "success");
+               resetForm.reset();
+               setTimeout(() => {
+                  backToLoginLink.click();
+               }, 3500);
+            } else {
+               showMsg(msgContainer, data.error || "Failed to reset password", "error");
+            }
+         } catch (err) {
+            showMsg(msgContainer, "Server communication error", "error");
+         }
+      });
+      
+      function showMsg(container, text, type) {
+         if (type === 'error') {
+            container.innerHTML = `
+               <div class="error-msg" style="margin-bottom: 12px;">
+                  <i class="fa-solid fa-circle-exclamation"></i> ${text}
+               </div>
+            `;
+         } else if (type === 'success') {
+            container.innerHTML = `
+               <div class="success-msg" style="margin-bottom: 12px;">
+                  <i class="fa-solid fa-circle-check"></i> ${text}
+               </div>
+            `;
+         } else {
+            container.innerHTML = `
+               <div class="info-msg" style="margin-bottom: 12px; font-size: 0.85rem; color: #4f46e5; font-weight: 500;">
+                  <i class="fa-solid fa-circle-info"></i> ${text}
+               </div>
+            `;
+         }
+      }
+
+      // Password toggle visibility logic
+      document.querySelectorAll('.toggle-password').forEach(btn => {
+         btn.addEventListener('click', () => {
+            const targetId = btn.getAttribute('data-target');
+            const inputField = document.getElementById(targetId);
+            if (inputField.type === 'password') {
+               inputField.type = 'text';
+               btn.classList.remove('fa-eye');
+               btn.classList.add('fa-eye-slash');
+            } else {
+               inputField.type = 'password';
+               btn.classList.remove('fa-eye-slash');
+               btn.classList.add('fa-eye');
+            }
+         });
+      });
+   </script>
 </body>
 
 </html>

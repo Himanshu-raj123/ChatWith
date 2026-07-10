@@ -82,8 +82,47 @@ async function handleLogout(req,res){
       res.redirect("/user/login");  
 }
 
+
+async function handleResetPassword(req, res) {
+   const { email, password, confirmPassword } = req.body;
+
+   if (!email || !password || !confirmPassword) {
+      return res.status(400).json({ error: "All fields are required" });
+   }
+
+   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+   if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: "Please enter a valid email address" });
+   }
+
+   if (password.length < 6) {
+      return res.status(400).json({ error: "Password must be at least 6 characters long" });
+   }
+
+   if (password !== confirmPassword) {
+      return res.status(400).json({ error: "Passwords do not match" });
+   }
+
+   try {
+      const user = await Users.findOne({ Email: email });
+      if (!user) {
+         return res.status(404).json({ error: "No account found with this email address" });
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 12);
+      user.Password = hashedPassword;
+      await user.save();
+
+      return res.status(200).json({ message: "Password updated successfully" });
+   } catch (err) {
+      console.error("Password Reset Error:", err);
+      return res.status(500).json({ error: "Internal Server Error" });
+   }
+}
+
 module.exports={
    handleLogin,
    handleSignup,
-   handleLogout
+   handleLogout,
+   handleResetPassword
 }

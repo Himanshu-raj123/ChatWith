@@ -2,7 +2,7 @@ const express = require('express')
 const path = require('path')
 const router = express.Router();
 const { requireAuth, requireGuest, authorizeRoles } = require('../middlewares/auth')
-const {handleLogin,handleSignup,handleLogout} = require('../controllers/user')
+const {handleLogin,handleSignup,handleLogout,handleResetPassword} = require('../controllers/user')
 const {askGroq} = require('../aiService')
 
 const Users = require('../models/users')
@@ -19,6 +19,8 @@ router.get('/login',requireGuest,(req,res)=>{
 router.post('/login',requireGuest,handleLogin)
 
 router.post('/signup',requireGuest,handleSignup)
+
+router.post('/reset-password',requireGuest,handleResetPassword)
 
 router.get('/dashboard',requireAuth, async(req,res)=>{
    let allUsers = await FindAllUsers();
