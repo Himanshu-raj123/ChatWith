@@ -15,10 +15,9 @@ const transporter = nodemailer.createTransport({
  * Sends a welcome email to a newly signed up user
  * @param {string} toEmail - The recipient's email address
  * @param {string} toName - The recipient's full name
- * @param {string} password - The recipient's raw password
  * @returns {Promise<boolean>}
  */
-async function sendWelcomeEmail(toEmail, toName, password) {
+async function sendWelcomeEmail(toEmail, toName) {
   // Check if SMTP is configured
   if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
     console.warn("SMTP credentials (SMTP_USER, SMTP_PASS) not configured. Skipping welcome email.");
@@ -78,30 +77,6 @@ async function sendWelcomeEmail(toEmail, toName, password) {
             color: #475569;
             margin-bottom: 24px;
           }
-          .creds-box {
-            background-color: #f1f5f9;
-            padding: 20px;
-            border-radius: 12px;
-            margin: 25px 0;
-            border: 1px solid #e2e8f0;
-          }
-          .creds-title {
-            margin-bottom: 10px;
-            color: #475569;
-            font-size: 14px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-          }
-          .creds-detail {
-            font-size: 15px;
-            color: #0f172a;
-            margin-bottom: 6px;
-            font-family: monospace;
-          }
-          .creds-detail:last-child {
-            margin-bottom: 0;
-          }
           .btn {
             display: inline-block;
             background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
@@ -132,13 +107,6 @@ async function sendWelcomeEmail(toEmail, toName, password) {
           <div class="content">
             <h2>Hi ${toName},</h2>
             <p>Welcome to ChatWith! Your account has been created successfully. We're thrilled to have you join our community.</p>
-            
-            <div class="creds-box">
-              <div class="creds-title">Your Account Credentials</div>
-              <div class="creds-detail"><strong>Email Address:</strong> ${toEmail}</div>
-              <div class="creds-detail"><strong>Password:</strong> ${password}</div>
-            </div>
-
             <p>You can now connect instantly with your friends in real-time, or chat with <strong>Swayam</strong>, our smart AI assistant powered by Groq.</p>
             <div style="text-align: center; margin: 35px 0;">
               <a href="${process.env.APP_URL || 'http://localhost:4000'}" class="btn">Launch ChatWith</a>

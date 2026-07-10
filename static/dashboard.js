@@ -142,6 +142,10 @@ function setupChatSwitch(card) {
     const selectedEmail = card.getAttribute('data-email');
     const selectedName = card.getAttribute('data-name');
 
+    // Toggle views on mobile
+    document.getElementById('id1').classList.add('mobile-hidden');
+    document.getElementById('id2').classList.remove('mobile-hidden');
+
     // Remove "New!" badge if it exists
     let badge = card.querySelector('.new-msg-badge');
     if (badge) badge.remove();
@@ -163,6 +167,7 @@ function setupChatSwitch(card) {
     let id2 = document.getElementById("id2");
     id2.innerHTML = `
         <div id="user">
+          <button id="mobile-back-btn" class="mobile-back" title="Back to users"><i class="fa-solid fa-arrow-left"></i></button>
           <div><i class="fa-solid fa-user"></i></div>
           <div>
             <span id="reciverEmail" style="display:none;">${selectedEmail}</span>
@@ -191,6 +196,15 @@ function setupChatSwitch(card) {
           <button type="submit" id="sendBtn"><i class="fa-solid fa-paper-plane"></i></button>
         </form>
       `;
+
+    // Mobile back button event listener
+    const backBtn = document.getElementById('mobile-back-btn');
+    if (backBtn) {
+      backBtn.addEventListener('click', () => {
+        document.getElementById('id1').classList.remove('mobile-hidden');
+        document.getElementById('id2').classList.add('mobile-hidden');
+      });
+    }
 
     // Scroll chat to bottom immediately
     let chatbox = document.getElementById('chat-messages');
@@ -238,3 +252,76 @@ socket.on("messagesSeen", (seenByEmail) => {
       });
   }
 });
+
+// Settings modal toggles
+const settingsBtn = document.getElementById('settings-btn');
+const settingsModal = document.getElementById('settings-modal');
+const closeSettingsBtn = document.getElementById('close-settings-btn');
+const deleteAccountBtn = document.getElementById('delete-account-btn');
+
+const deleteConfirmModal = document.getElementById('delete-confirm-modal');
+const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+
+if (settingsBtn) {
+   settingsBtn.addEventListener('click', () => {
+      settingsModal.style.display = 'flex';
+   });
+}
+
+if (closeSettingsBtn) {
+   closeSettingsBtn.addEventListener('click', () => {
+      settingsModal.style.display = 'none';
+   });
+}
+
+// Close modal on click outside modal-card
+window.addEventListener('click', (e) => {
+   if (e.target === settingsModal) {
+      settingsModal.style.display = 'none';
+   }
+   if (e.target === deleteConfirmModal) {
+      deleteConfirmModal.style.display = 'none';
+   }
+});
+
+if (deleteAccountBtn) {
+   deleteAccountBtn.addEventListener('click', () => {
+      deleteConfirmModal.style.display = 'flex';
+   });
+}
+
+if (cancelDeleteBtn) {
+   cancelDeleteBtn.addEventListener('click', () => {
+      deleteConfirmModal.style.display = 'none';
+   });
+}
+
+if (confirmDeleteBtn) {
+   confirmDeleteBtn.addEventListener('click', async () => {
+      try {
+         confirmDeleteBtn.disabled = true;
+         confirmDeleteBtn.innerText = "Deleting...";
+         
+         const response = await fetch('/user/delete-account', {
+            method: 'POST',
+            headers: {
+               'Content-Type': 'application/json'
+            }
+         });
+
+         if (response.ok) {
+            window.location.href = '/user/signup';
+         } else {
+            alert("Failed to delete account. Please try again.");
+            confirmDeleteBtn.disabled = false;
+            confirmDeleteBtn.innerText = "Yes, Delete Account";
+         }
+      } catch (err) {
+         console.error("Account deletion error:", err);
+         alert("Server communication error.");
+         confirmDeleteBtn.disabled = false;
+         confirmDeleteBtn.innerText = "Yes, Delete Account";
+      }
+   });
+}

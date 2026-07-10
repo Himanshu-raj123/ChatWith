@@ -54,18 +54,18 @@
          <div id="current-user-info">
             <i class="fa-solid fa-circle-user"></i>
             <div class="user-details">
-               <span class="name" id="current-user-display-name">
+               <span class="name">
                   <%= user?.name %>
                </span>
                <span class="email">
                   <%= user?.email || "Ai" %>
                </span>
             </div>
-            <i class="fa-solid fa-gear" id="open-settings-btn" title="Profile Settings" style="cursor: pointer; margin-left: auto; font-size: 1.2rem; color: #64748b; transition: color 0.2s;"></i>
+            <button id="settings-btn" title="Settings" style="background: none; border: none; margin-left: auto; cursor: pointer; color: #64748b; font-size: 1.1rem; transition: color 0.2s;"><i class="fa-solid fa-gear"></i></button>
          </div>
       </div>
 
-      <div id="id2">
+      <div id="id2" class="mobile-hidden">
          <div class="welcome-screen">
             <i class="fa-solid fa-comments"></i>
             <h3>Welcome to ChatWith, <%= user?.name %>!</h3>
@@ -75,51 +75,38 @@
    </div>
 
    <!-- Settings Modal -->
-   <div id="settings-modal" class="modal" style="display: none;">
-      <div class="modal-content">
+   <div id="settings-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-card">
          <div class="modal-header">
-            <h2>Profile Settings</h2>
-            <span class="close-modal-btn" id="close-settings-btn">&times;</span>
+            <h3>Settings</h3>
+            <button id="close-settings-btn" class="close-btn">&times;</button>
          </div>
          <div class="modal-body">
-            <form id="update-profile-form">
-               <div class="input-group">
-                  <label for="settings-name"><i class="fa-solid fa-user"></i> Full Name</label>
-                  <input type="text" id="settings-name" value="<%= user?.name %>" required minlength="3">
+            <p style="margin-bottom: 20px; font-size: 0.95rem; color: #64748b;">Manage your account settings below.</p>
+            <div class="setting-item">
+               <div class="setting-info">
+                  <h4 style="color: #dc2626; font-weight: 600;"><i class="fa-solid fa-triangle-exclamation"></i> Delete Account</h4>
+                  <p style="font-size: 0.85rem; color: #94a3b8; margin-top: 4px;">Permanently delete your account and all associated messages. This action cannot be undone.</p>
                </div>
-               
-               <div class="input-group" style="position: relative;">
-                  <label for="settings-password"><i class="fa-solid fa-lock"></i> New Password (leave blank to keep current)</label>
-                  <input type="password" id="settings-password" placeholder="New Password" style="padding-right: 40px;">
-                  <i class="fa-regular fa-eye toggle-password" data-target="settings-password" style="position: absolute; right: 12px; bottom: 12px; cursor: pointer; color: #64748b;"></i>
-               </div>
-               
-               <div class="input-group" style="position: relative;">
-                  <label for="settings-confirm-password"><i class="fa-solid fa-lock"></i> Confirm New Password</label>
-                  <input type="password" id="settings-confirm-password" placeholder="Confirm Password" style="padding-right: 40px;">
-                  <i class="fa-regular fa-eye toggle-password" data-target="settings-confirm-password" style="position: absolute; right: 12px; bottom: 12px; cursor: pointer; color: #64748b;"></i>
-               </div>
-               
-               <div class="settings-message-container"></div>
-               
-               <button type="submit" class="submit-btn" style="background: linear-gradient(135deg, #4f46e5, #6366f1); margin-top: 10px; width: 100%;">Save Changes <i class="fa-solid fa-floppy-disk"></i></button>
-            </form>
-            
-            <hr style="margin: 24px 0; border: 0; border-top: 1px solid #e2e8f0;">
-            
-            <div class="danger-zone">
-               <h3>Danger Zone</h3>
-               <p>Once you delete your account, there is no going back. Please be certain.</p>
-               <button id="delete-account-btn" class="delete-btn">Delete Account <i class="fa-solid fa-trash-can"></i></button>
-               
-               <!-- Delete Confirmation Sub-panel -->
-               <div id="delete-confirm-panel" style="display: none; margin-top: 15px; padding: 15px; background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.15); border-radius: 10px;">
-                  <p style="color: #dc2626; font-weight: 600; font-size: 0.85rem;">Are you absolutely sure? All your chats and messages will be permanently deleted.</p>
-                  <div style="display: flex; gap: 10px; margin-top: 12px;">
-                     <button id="confirm-delete-btn" class="delete-btn" style="padding: 8px 14px; font-size: 0.8rem;">Yes, Delete Permanently</button>
-                     <button id="cancel-delete-btn" style="padding: 8px 14px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600; color: #475569;">Cancel</button>
-                  </div>
-               </div>
+               <button id="delete-account-btn" class="danger-btn">Delete Account</button>
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <!-- Delete Confirmation Modal -->
+   <div id="delete-confirm-modal" class="modal-overlay" style="display: none; z-index: 1100;">
+      <div class="modal-card confirmation-card">
+         <div class="modal-header">
+            <h3>Confirm Deletion</h3>
+         </div>
+         <div class="modal-body" style="text-align: center; padding: 20px 10px;">
+            <i class="fa-solid fa-trash-can" style="font-size: 3rem; color: #dc2626; margin-bottom: 16px; display: block;"></i>
+            <h4 style="margin-bottom: 10px; font-weight: 700; color: #0f172a;">Are you absolutely sure?</h4>
+            <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 24px; line-height: 1.5;">This will permanently delete your account and clear all of your messages. You will be logged out immediately.</p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+               <button id="cancel-delete-btn" class="cancel-btn">Cancel</button>
+               <button id="confirm-delete-btn" class="confirm-danger-btn">Yes, Delete Account</button>
             </div>
          </div>
       </div>
@@ -131,155 +118,6 @@
    </script>
    <script src="/socket.io/socket.io.js"></script>
    <script src="/dashboard.js"></script>
-   
-   <script>
-      // Settings Modal Open/Close Toggles
-      const settingsModal = document.getElementById('settings-modal');
-      const openSettingsBtn = document.getElementById('open-settings-btn');
-      const closeSettingsBtn = document.getElementById('close-settings-btn');
-      const updateProfileForm = document.getElementById('update-profile-form');
-      const settingsMsgContainer = document.querySelector('.settings-message-container');
-      
-      const deleteAccountBtn = document.getElementById('delete-account-btn');
-      const deleteConfirmPanel = document.getElementById('delete-confirm-panel');
-      const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-      const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
-
-      openSettingsBtn.addEventListener('click', () => {
-         settingsModal.style.display = 'flex';
-      });
-
-      closeSettingsBtn.addEventListener('click', () => {
-         settingsModal.style.display = 'none';
-         updateProfileForm.reset();
-         settingsMsgContainer.innerHTML = '';
-         deleteConfirmPanel.style.display = 'none';
-      });
-
-      // Close modal on click outside content
-      window.addEventListener('click', (e) => {
-         if (e.target === settingsModal) {
-            closeSettingsBtn.click();
-         }
-      });
-
-      // Password visibility toggles inside Settings Modal
-      document.querySelectorAll('.modal .toggle-password').forEach(btn => {
-         btn.addEventListener('click', () => {
-            const targetId = btn.getAttribute('data-target');
-            const inputField = document.getElementById(targetId);
-            if (inputField.type === 'password') {
-               inputField.type = 'text';
-               btn.classList.remove('fa-eye');
-               btn.classList.add('fa-eye-slash');
-            } else {
-               inputField.type = 'password';
-               btn.classList.remove('fa-eye-slash');
-               btn.classList.add('fa-eye');
-            }
-         });
-      });
-
-      // Update Profile Details (Name & Password)
-      updateProfileForm.addEventListener('submit', async (e) => {
-         e.preventDefault();
-         const name = document.getElementById('settings-name').value.trim();
-         const password = document.getElementById('settings-password').value;
-         const confirmPassword = document.getElementById('settings-confirm-password').value;
-
-         if (!name) {
-            showSettingsMsg("Name is required", "error");
-            return;
-         }
-
-         if (password) {
-            if (password.length < 6) {
-               showSettingsMsg("Password must be at least 6 characters long", "error");
-               return;
-            }
-            if (password !== confirmPassword) {
-               showSettingsMsg("Passwords do not match", "error");
-               return;
-            }
-         }
-
-         try {
-            showSettingsMsg("Saving changes...", "info");
-            const response = await fetch('/user/update-profile', {
-               method: 'POST',
-               headers: {
-                  'Content-Type': 'application/json'
-               },
-               body: JSON.stringify({ name, password, confirmPassword })
-            });
-
-            const data = await response.json();
-            if (response.ok) {
-               showSettingsMsg("Profile updated successfully!", "success");
-               document.getElementById('current-user-display-name').innerText = data.name;
-               // Clear password fields
-               document.getElementById('settings-password').value = '';
-               document.getElementById('settings-confirm-password').value = '';
-               setTimeout(() => {
-                  closeSettingsBtn.click();
-               }, 1500);
-            } else {
-               showSettingsMsg(data.error || "Failed to update profile", "error");
-            }
-         } catch (err) {
-            showSettingsMsg("Server communication error", "error");
-         }
-      });
-
-      // Delete Account Flow
-      deleteAccountBtn.addEventListener('click', () => {
-         deleteConfirmPanel.style.display = 'block';
-      });
-
-      cancelDeleteBtn.addEventListener('click', () => {
-         deleteConfirmPanel.style.display = 'none';
-      });
-
-      confirmDeleteBtn.addEventListener('click', async () => {
-         try {
-            const response = await fetch('/user/delete-account', {
-               method: 'POST'
-            });
-
-            if (response.ok) {
-               // Account deleted successfully. Redirect to login!
-               window.location.href = '/user/login';
-            } else {
-               const data = await response.json();
-               showSettingsMsg(data.error || "Failed to delete account", "error");
-            }
-         } catch (err) {
-            showSettingsMsg("Server communication error", "error");
-         }
-      });
-
-      function showSettingsMsg(text, type) {
-         if (type === 'error') {
-            settingsMsgContainer.innerHTML = `
-               <div class="error-msg" style="margin-top: 10px; margin-bottom: 10px;">
-                  <i class="fa-solid fa-circle-exclamation"></i> ${text}
-               </div>
-            `;
-         } else if (type === 'success') {
-            settingsMsgContainer.innerHTML = `
-               <div class="success-msg" style="margin-top: 10px; margin-bottom: 10px;">
-                  <i class="fa-solid fa-circle-check"></i> ${text}
-               </div>
-            `;
-         } else {
-            settingsMsgContainer.innerHTML = `
-               <div style="margin-top: 10px; margin-bottom: 10px; font-size: 0.85rem; color: #4f46e5; font-weight: 500;">
-                  <i class="fa-solid fa-circle-info"></i> ${text}
-               </div>
-            `;
-         }
-      }
-   </script>
 </body>
 
 </html>

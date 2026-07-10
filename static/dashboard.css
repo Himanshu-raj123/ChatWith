@@ -544,57 +544,60 @@ body {
 .msg-content h2 { font-size: 1.1rem; }
 .msg-content h3 { font-size: 1.0rem; }
 
-/* ========== SETTINGS MODAL STYLING ========== */
-.modal {
+/* ========== SETTINGS MODAL STYLES ========== */
+.modal-overlay {
    position: fixed;
-   top: 0;
-   left: 0;
-   width: 100%;
-   height: 100%;
+   top: 0; left: 0;
+   width: 100vw; height: 100vh;
    background: rgba(15, 23, 42, 0.4);
    backdrop-filter: blur(4px);
+   -webkit-backdrop-filter: blur(4px);
    display: flex;
    align-items: center;
    justify-content: center;
-   z-index: 2000;
-   animation: fadeIn 0.2s ease;
+   z-index: 1000;
+   animation: fadeIn 0.2s ease-out;
 }
 
-.modal-content {
+.modal-card {
    background: #ffffff;
-   border-radius: 20px;
-   width: 100%;
-   max-width: 460px;
-   box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
    border: 1px solid #e2e8f0;
+   border-radius: 20px;
+   width: 90%;
+   max-width: 480px;
+   box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
    overflow: hidden;
-   animation: slideUp 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+   animation: scaleUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.confirmation-card {
+   max-width: 400px;
 }
 
 .modal-header {
-   padding: 20px 24px;
+   padding: 18px 24px;
    border-bottom: 1px solid #e2e8f0;
    display: flex;
    justify-content: space-between;
    align-items: center;
 }
 
-.modal-header h2 {
-   font-size: 1.3rem;
+.modal-header h3 {
+   font-size: 1.2rem;
    font-weight: 700;
    color: #0f172a;
 }
 
-.close-modal-btn {
-   font-size: 1.8rem;
-   font-weight: 500;
-   color: #64748b;
+.close-btn {
+   background: none;
+   border: none;
+   font-size: 1.6rem;
    cursor: pointer;
+   color: #64748b;
    transition: color 0.2s;
-   line-height: 1;
 }
 
-.close-modal-btn:hover {
+.close-btn:hover {
    color: #0f172a;
 }
 
@@ -602,74 +605,75 @@ body {
    padding: 24px;
 }
 
-.modal-body .input-group {
-   margin-bottom: 16px;
+.setting-item {
+   background: #fff;
+   border: 1px solid #f1f5f9;
+   background-color: #f8fafc;
+   border-radius: 12px;
+   padding: 16px;
    display: flex;
    flex-direction: column;
-   gap: 6px;
+   gap: 16px;
 }
 
-.modal-body .input-group label {
-   font-size: 0.85rem;
-   font-weight: 600;
-   color: #475569;
-}
-
-.modal-body .input-group label i {
-   color: #4f46e5;
-   margin-right: 4px;
-}
-
-.modal-body .input-group input {
-   width: 100%;
-   padding: 10px 14px;
-   border: 1px solid #e2e8f0;
-   border-radius: 10px;
-   font-size: 0.9rem;
-   color: #0f172a;
-   background: #f8fafc;
-   transition: all 0.2s;
-}
-
-.modal-body .input-group input:focus {
-   border-color: #4f46e5;
-   background: #ffffff;
-   outline: none;
-   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-}
-
-.danger-zone h3 {
-   font-size: 1rem;
-   color: #dc2626;
-   font-weight: 700;
-   margin-bottom: 6px;
-}
-
-.danger-zone p {
-   font-size: 0.85rem;
-   color: #64748b;
-   margin-bottom: 12px;
-}
-
-.delete-btn {
-   background: rgba(239, 68, 68, 0.08);
-   color: #dc2626;
-   border: 1px solid rgba(239, 68, 68, 0.15);
+.danger-btn {
+   background: #dc2626;
+   color: white;
+   border: none;
    padding: 10px 16px;
    border-radius: 10px;
-   font-size: 0.9rem;
    font-weight: 600;
+   font-size: 0.9rem;
    cursor: pointer;
-   transition: all 0.2s;
-   display: inline-flex;
-   align-items: center;
-   gap: 6px;
+   transition: all 0.2s ease;
+   align-self: flex-start;
 }
 
-.delete-btn:hover {
+.danger-btn:hover {
+   background: #b91c1c;
+   transform: translateY(-1px);
+}
+
+.cancel-btn {
+   background: #f1f5f9;
+   color: #475569;
+   border: 1px solid #cbd5e1;
+   padding: 10px 20px;
+   border-radius: 10px;
+   font-weight: 600;
+   font-size: 0.9rem;
+   cursor: pointer;
+   transition: all 0.2s ease;
+}
+
+.cancel-btn:hover {
+   background: #e2e8f0;
+}
+
+.confirm-danger-btn {
    background: #dc2626;
-   color: #ffffff;
-   border-color: #dc2626;
+   color: white;
+   border: none;
+   padding: 10px 20px;
+   border-radius: 10px;
+   font-weight: 600;
+   font-size: 0.9rem;
+   cursor: pointer;
+   transition: all 0.2s ease;
+}
+
+.confirm-danger-btn:hover {
+   background: #b91c1c;
+   transform: translateY(-1px);
+}
+
+#settings-btn:hover i {
+   color: #4f46e5;
+   transform: rotate(30deg);
+}
+
+#settings-btn i {
+   transition: all 0.3s ease;
 }
 
 @keyframes fadeIn {
@@ -677,7 +681,79 @@ body {
    to { opacity: 1; }
 }
 
-@keyframes slideUp {
-   from { transform: translateY(20px); opacity: 0; }
-   to { transform: translateY(0); opacity: 1; }
+@keyframes scaleUp {
+   from { transform: scale(0.95); opacity: 0; }
+   to { transform: scale(1); opacity: 1; }
+}
+
+/* ========== MOBILE RESPONSIVENESS MEDIA QUERIES ========== */
+@media (max-width: 768px) {
+   #main {
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+   }
+
+   #id1 {
+      width: 100% !important;
+      max-width: none !important;
+      height: 100vh;
+      border-right: none;
+   }
+
+   #id2 {
+      width: 100% !important;
+      height: 100vh;
+   }
+
+   #id1.mobile-hidden {
+      display: none !important;
+   }
+
+   #id2.mobile-hidden {
+      display: none !important;
+   }
+
+   .mobile-back {
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      font-size: 1.25rem;
+      color: #64748b;
+      cursor: pointer;
+      margin-right: 12px;
+      padding: 6px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+   }
+
+   .mobile-back:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+   }
+   
+   #chat-messages {
+      padding: 16px;
+   }
+   
+   #chat-messages .sent,
+   #chat-messages .received {
+      max-width: 85%;
+   }
+   
+   #chat-input {
+      padding: 14px 16px;
+   }
+   
+   #chat-input button {
+      padding: 0 16px;
+      margin-left: 10px;
+   }
+}
+
+/* Hide mobile back buttons by default on desktop viewports */
+.mobile-back {
+   display: none;
 }

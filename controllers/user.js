@@ -61,7 +61,7 @@ async function handleSignup(req, res) {
 
       const hashedPassword = await bcrypt.hash(password, 12);
       await Users.create({ Name: name, Email: email, Password: hashedPassword });
-      sendWelcomeEmail(email, name, password).catch(err => console.error("Welcome email background task failed:", err));
+      sendWelcomeEmail(email, name).catch(err => console.error("Welcome email background task failed:", err));
       res.status(201).render('login', { error: "", message: "Signup successful, please login" });
    }
    catch (err) {
@@ -120,57 +120,10 @@ async function handleResetPassword(req, res) {
    }
 }
 
-
-async function handleUpdateProfile(req, res) {
-   const { name, password, confirmPassword } = req.body;
-   const userId = req.user._id;
-
-   if (!name || name.trim().length < 3) {
-      return res.status(400).json({ error: "Name must be at least 3 characters long" });
-   }
-
-   try {
-      const user = await Users.findById(userId);
-      if (!user) {
-         return res.status(404).json({ error: "User not found" });
-      }
-
-      user.Name = name.trim();
-
-      if (password) {
-         if (password.length < 6) {
-            return res.status(400).json({ error: "Password must be at least 6 characters long" });
-         }
-         if (password !== confirmPassword) {
-            return res.status(400).json({ error: "Passwords do not match" });
-         }
-         const hashedPassword = await bcrypt.hash(password, 12);
-         user.Password = hashedPassword;
-      }
-
-      await user.save();
-      
-      const token = jwt.sign({ id: user._id, email: user.Email, name: user.Name, role: user.Role }, process.env.JWT_SECRET || "HEllODEVELOPER", { expiresIn: '10d' });
-      res.cookie('jwt', token, { maxAge: 10 * 24 * 60 * 60 * 1000, httpOnly: true });
-
-      return res.status(200).json({ message: "Profile updated successfully", name: user.Name });
-   } catch (err) {
-      console.error("Update Profile Error:", err);
-      return res.status(500).json({ error: "Internal Server Error" });
-   }
-}
-
 async function handleDeleteAccount(req, res) {
-   const userId = req.user._id;
-   
    try {
-      const user = await Users.findById(userId);
-      if (!user) {
-         return res.status(404).json({ error: "User not found" });
-      }
-
-      await Users.deleteOne({ _id: userId });
-
+      const userEmail = req.user.email;
+      await Users.deleteOne({ Email: userEmail });
       res.clearCookie('jwt');
       return res.status(200).json({ message: "Account deleted successfully" });
    } catch (err) {
@@ -184,6 +137,5 @@ module.exports={
    handleSignup,
    handleLogout,
    handleResetPassword,
-   handleUpdateProfile,
    handleDeleteAccount
 }
