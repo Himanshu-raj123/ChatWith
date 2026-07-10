@@ -5,6 +5,9 @@
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>ChatWith</title>
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
@@ -22,7 +25,7 @@
 
          <h4 class="section-title">All Users Of ChatWith</h4>
          <div id="chats">
-            <div class="user-card" data-email="AI" data-name="Swayam" style="background: linear-gradient(to left, #a4b686, #bd3636, #449e96)">
+            <div class="user-card ai-card" data-email="AI" data-name="Swayam">
                <div class="user-info">
                   <span class="user-name">
                      Swayam <i class="fa-solid fa-robot"></i>
@@ -62,24 +65,11 @@
       </div>
 
       <div id="id2">
-         <div id="user">
-            <div><i class="fa-solid fa-user"></i> </div>
-            <div>
-               <span id="reciverEmail">
-                  <%= user?.email %>
-               </span><br>
-               <span>(<%= user?.name %>)</span>
-            </div>
+         <div class="welcome-screen">
+            <i class="fa-solid fa-comments"></i>
+            <h3>Welcome to ChatWith, <%= user?.name %>!</h3>
+            <p>Select a user from the sidebar to start chatting, or click on <strong>Swayam</strong> to talk with the AI assistant.</p>
          </div>
-
-         <div id="chat-messages">
-         </div>
-
-         <form id="chat-input">
-            <input type="text" id="messageInput" placeholder="Type a message..." />
-            <button type="submit" id="sendBtn"><i class="fa-solid fa-paper-plane"></i></button>
-         </form>
-
       </div>
    </div>
 

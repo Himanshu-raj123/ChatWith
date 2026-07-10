@@ -1,6 +1,3 @@
-let chatForm = document.getElementById('chat-input');
-let input = document.getElementById('messageInput');
-
 const socket = io();
 let activeUSers;
 
@@ -17,6 +14,10 @@ function formatTime(timestamp) {
 }
 
 function formatMessageContent(message, sender) {
+  if (message === undefined || message === null) {
+    return '';
+  }
+  message = String(message);
   if (sender === 'AI') {
     if (typeof marked !== 'undefined') {
       return marked.parse(message);
@@ -31,56 +32,31 @@ function formatMessageContent(message, sender) {
   return escaped.replace(/\n/g, '<br>');
 }
 
-async function copyMessageText(button) {
-  const msgDiv = button.closest('.sent, .received');
-  const contentDiv = msgDiv.querySelector('.msg-content');
-  const textToCopy = contentDiv.innerText || contentDiv.textContent;
-  
-  try {
-    await navigator.clipboard.writeText(textToCopy);
-    const icon = button.querySelector('i');
-    icon.className = 'fa-solid fa-check';
-    button.style.color = '#22c55e';
-    setTimeout(() => {
-      icon.className = 'fa-regular fa-copy';
-      button.style.color = '';
-    }, 2000);
-  } catch (err) {
-    console.error('Failed to copy text: ', err);
+// Global click listener for copy message text functionality (Event Delegation)
+document.addEventListener('click', async (event) => {
+  const copyBtn = event.target.closest('.msg-copy');
+  if (copyBtn) {
+    const msgDiv = copyBtn.closest('.sent, .received');
+    const contentDiv = msgDiv.querySelector('.msg-content');
+    const textToCopy = contentDiv.innerText || contentDiv.textContent;
+    
+    try {
+      await navigator.clipboard.writeText(textToCopy.trim());
+      const icon = copyBtn.querySelector('i');
+      icon.className = 'fa-solid fa-check';
+      copyBtn.style.color = '#10b981'; // success green
+      setTimeout(() => {
+        icon.className = 'fa-regular fa-copy';
+        copyBtn.style.color = '';
+      }, 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
   }
-}
+});
 
 // Register active user
 socket.emit("active", loggedInUserEmail, loggedInUserName);
-
-// Handle sending message
-chatForm.addEventListener('submit', (event) => {
-  event.preventDefault();
-  const inputMessage = input.value.trim();
-  if (inputMessage) {
-    let selectedEmail = document.getElementById('reciverEmail').innerText;
-    socket.emit("privateMessage", inputMessage, loggedInUserEmail, selectedEmail);
-
-    // Show message in sender’s chat box
-    let chatbox = document.getElementById('chat-messages');
-    let div = document.createElement('div');
-    div.setAttribute('class', 'sent');
-    div.innerHTML = `
-        <div class="msg-content">${formatMessageContent(inputMessage, loggedInUserEmail)}</div>
-        <div class="msg-meta">
-           <span class="msg-copy" onclick="copyMessageText(this)" title="Copy message"><i class="fa-regular fa-copy"></i></span>
-           <span class="msg-time">${formatTime(new Date())}</span>
-           <span class="msg-status"><i class="fa-solid fa-check"></i></span>
-        </div>
-    `;
-    chatbox.appendChild(div);
-    setTimeout(() => {
-      chatbox.scrollTop = chatbox.scrollHeight;
-    }, 0);
-
-    input.value = "";
-  }
-});
 
 socket.on("privateMessage", (msgData) => {
   let activeChat = document.getElementById('reciverEmail');
@@ -90,11 +66,11 @@ socket.on("privateMessage", (msgData) => {
   if (activeChat && activeChat.innerText === sender && loggedInUserEmail != sender) {
     let chatbox = document.getElementById('chat-messages');
     let div = document.createElement('div');
-    div.setAttribute('class', 'received');
+    div.setAttribute('class', 'received' + (sender === 'AI' ? ' ai-message' : ''));
     div.innerHTML = `
         <div class="msg-content">${formatMessageContent(msgData.message, msgData.sender)}</div>
         <div class="msg-meta">
-           <span class="msg-copy" onclick="copyMessageText(this)" title="Copy message"><i class="fa-regular fa-copy"></i></span>
+           <span class="msg-copy" title="Copy message"><i class="fa-regular fa-copy"></i></span>
            <span class="msg-time">${formatTime(msgData.timestamp)}</span>
         </div>
     `;
@@ -190,17 +166,17 @@ function setupChatSwitch(card) {
           <div><i class="fa-solid fa-user"></i></div>
           <div>
             <span id="reciverEmail" style="display:none;">${selectedEmail}</span>
-            <span style="font-weight: 600; font-size: 1.1rem; color: #1e293b;">${selectedName}</span><br>
+            <span style="font-weight: 600; font-size: 1.1rem; color: #0f172a;">${selectedName}</span><br>
             <span style="font-size: 0.85rem; color: #64748b;">${selectedEmail}</span>
           </div>
         </div>
 
         <div id="chat-messages">
            ${chatHistory.map(msg => `
-              <div class="${msg.sender === loggedInUserEmail ? 'sent' : 'received'}">
+              <div class="${msg.sender === loggedInUserEmail ? 'sent' : (msg.sender === 'AI' ? 'received ai-message' : 'received')}">
                  <div class="msg-content">${formatMessageContent(msg.message, msg.sender)}</div>
                  <div class="msg-meta">
-                    <span class="msg-copy" onclick="copyMessageText(this)" title="Copy message"><i class="fa-regular fa-copy"></i></span>
+                    <span class="msg-copy" title="Copy message"><i class="fa-regular fa-copy"></i></span>
                     <span class="msg-time">${formatTime(msg.timestamp)}</span>
                     ${msg.sender === loggedInUserEmail ? 
                        `<span class="msg-status"><i class="fa-solid ${msg.seen ? 'fa-check-double' : 'fa-check'}"></i></span>` 
@@ -237,7 +213,7 @@ function setupChatSwitch(card) {
         div.innerHTML = `
             <div class="msg-content">${formatMessageContent(inputMessage, loggedInUserEmail)}</div>
             <div class="msg-meta">
-               <span class="msg-copy" onclick="copyMessageText(this)" title="Copy message"><i class="fa-regular fa-copy"></i></span>
+               <span class="msg-copy" title="Copy message"><i class="fa-regular fa-copy"></i></span>
                <span class="msg-time">${formatTime(new Date())}</span>
                <span class="msg-status"><i class="fa-solid fa-check"></i></span>
             </div>

@@ -4,31 +4,52 @@
 <head>
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Login</title>
+   <title>Login - ChatWith</title>
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
    <link rel="stylesheet" href="/login.css">
 </head>
 
 <body>
-   <form action="/user/login" method="post">
-      <h2>Login your account</h2>
-      Email:<input type="email" name="email" placeholder="your email"> <br> <br>
-      Password:<input type="password" name="password" placeholder="your password"> <br> <br>
-      <% if (error) { %>
-         <p style="color: red;">
-            <%= error %>
-         </p>
-      <% } %>
-      <% if (message) { %>
-         <p style="color: green;">
-               <%= message %>
-         </p>
-      <% } %>
-                
-      <input type="submit" value="Login"> <br>
-      <br>
-      <p>Don't have an account?</p>
-      <a href="/user/signup">SignUp</a>
-   </form>
+   <div class="container">
+      <div class="split-left">
+         <div class="hero-content">
+            <h1>ChatWith</h1>
+            <p>Connect instantly with your friends and chat with the smart AI assistant, Swayam.</p>
+         </div>
+      </div>
+      <div class="split-right">
+         <form action="/user/login" method="post">
+            <h2>Login your account</h2>
+            
+            <div class="input-group">
+               <label for="email"><i class="fa-solid fa-envelope"></i> Email</label>
+               <input type="email" id="email" name="email" placeholder="Enter your email" required autocomplete="email">
+            </div>
+            
+            <div class="input-group">
+               <label for="password"><i class="fa-solid fa-lock"></i> Password</label>
+               <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            
+            <% if (error) { %>
+               <div class="error-msg">
+                  <i class="fa-solid fa-circle-exclamation"></i> <%= error %>
+               </div>
+            <% } %>
+            <% if (message) { %>
+               <div class="success-msg">
+                  <i class="fa-solid fa-circle-check"></i> <%= message %>
+               </div>
+            <% } %>
+                      
+            <button type="submit" class="submit-btn">Login <i class="fa-solid fa-arrow-right-to-bracket"></i></button>
+            
+            <div class="form-footer">
+               <p>Don't have an account? <a href="/user/signup">Sign Up here</a></p>
+            </div>
+         </form>
+      </div>
+   </div>
 </body>
 
 </html>

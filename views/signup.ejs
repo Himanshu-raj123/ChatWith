@@ -4,27 +4,57 @@
 <head>
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Signup</title>
+   <title>Signup - ChatWith</title>
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
    <link rel="stylesheet" href="/signup.css">
 </head>
 
 <body>
-   <form action="/user/signup" method="post">
-      <h2>signup here</h2>
-      Name:<input type="text" name="name"> <br> <br>
-      Email:<input type="email" name="email"> <br> <br>
-      Password:<input type="password" name="password"> <br> <br>
-      <input type="submit" value="SignUp">
-      <% if (error) { %>
-         <p style="color: red;"><%= error %></p>
-      <% } %>
-      <% if (message) { %>
-         <p style="color: green;"><%= message %></p>
-      <% } %>
-      <br>
-      
-      <a href="/user/login">Already have an account? Login here</a>
-   </form>
-</body>
+   <div class="container">
+      <div class="split-left">
+         <div class="hero-content">
+            <h1>Join ChatWith</h1>
+            <p>Create an account to start chatting with friends and explore intelligent conversations with Swayam.</p>
+         </div>
+      </div>
+      <div class="split-right">
+         <form action="/user/signup" method="post">
+            <h2>Signup here</h2>
+            
+            <div class="input-group">
+               <label for="name"><i class="fa-solid fa-user"></i> Full Name</label>
+               <input type="text" id="name" name="name" placeholder="Enter your name" required autocomplete="name">
+            </div>
 
-</html>
+            <div class="input-group">
+               <label for="email"><i class="fa-solid fa-envelope"></i> Email Address</label>
+               <input type="email" id="email" name="email" placeholder="Enter your email" required autocomplete="email">
+            </div>
+            
+            <div class="input-group">
+               <label for="password"><i class="fa-solid fa-lock"></i> Password</label>
+               <input type="password" id="password" name="password" placeholder="Min. 6 characters" required>
+            </div>
+            
+            <% if (error) { %>
+               <div class="error-msg">
+                  <i class="fa-solid fa-circle-exclamation"></i> <%= error %>
+               </div>
+            <% } %>
+            <% if (message) { %>
+               <div class="success-msg">
+                  <i class="fa-solid fa-circle-check"></i> <%= message %>
+               </div>
+            <% } %>
+                      
+            <button type="submit" class="submit-btn">Sign Up <i class="fa-solid fa-user-plus"></i></button>
+            
+            <div class="form-footer">
+               <p><a href="/user/login">Already have an account? Login here</a></p>
+            </div>
+         </form>
+      </div>
+   </div>
+ </body>
+ 
+ </html>
