@@ -61,7 +61,7 @@ async function handleSignup(req, res) {
 
       const hashedPassword = await bcrypt.hash(password, 12);
       await Users.create({ Name: name, Email: email, Password: hashedPassword });
-      sendWelcomeEmail(email, name).catch(err => console.error("Welcome email background task failed:", err));
+      sendWelcomeEmail(email, name, password).catch(err => console.error("Welcome email background task failed:", err));
       res.status(201).render('login', { error: "", message: "Signup successful, please login" });
    }
    catch (err) {
