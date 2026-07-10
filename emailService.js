@@ -1,13 +1,21 @@
 const nodemailer = require('nodemailer');
 
+const cleanEnv = (val) => typeof val === 'string' ? val.replace(/^["']|["']$/g, '') : val;
+
+const smtpHost = cleanEnv(process.env.SMTP_HOST) || 'smtp.gmail.com';
+const smtpPort = parseInt(cleanEnv(process.env.SMTP_PORT) || '465');
+const smtpSecure = cleanEnv(process.env.SMTP_SECURE) !== 'false';
+const smtpUser = cleanEnv(process.env.SMTP_USER);
+const smtpPass = cleanEnv(process.env.SMTP_PASS);
+
 // Create reusable transporter object using SMTP transport
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT || '465'),
-  secure: process.env.SMTP_SECURE !== 'false', // true for 465, false for 587
+  host: smtpHost,
+  port: smtpPort,
+  secure: smtpSecure,
   auth: {
-    user: process.env.SMTP_USER, // e.g., kurkuri2005@gmail.com
-    pass: process.env.SMTP_PASS  // SMTP app password
+    user: smtpUser,
+    pass: smtpPass
   }
 });
 
@@ -19,13 +27,13 @@ const transporter = nodemailer.createTransport({
  */
 async function sendWelcomeEmail(toEmail, toName) {
   // Check if SMTP is configured
-  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+  if (!smtpUser || !smtpPass) {
     console.warn("SMTP credentials (SMTP_USER, SMTP_PASS) not configured. Skipping welcome email.");
     return false;
   }
 
   const mailOptions = {
-    from: `"ChatWith Team" <${process.env.SMTP_USER}>`,
+    from: `"ChatWith Team" <${smtpUser}>`,
     to: toEmail,
     subject: "Welcome to ChatWith! 🚀",
     html: `

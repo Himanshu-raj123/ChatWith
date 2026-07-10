@@ -1,12 +1,15 @@
 const jwt = require('jsonwebtoken');
 
+const cleanEnv = (val) => typeof val === 'string' ? val.replace(/^["']|["']$/g, '') : val;
+const jwtSecret = cleanEnv(process.env.JWT_SECRET) || 'HEllODEVELOPER';
+
 function requireAuth(req, res, next) {
    const token = req.cookies.jwt;
    if (!token){
       return res.redirect('/user/login');
    }
    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'HEllODEVELOPER');
+      const decoded = jwt.verify(token, jwtSecret);
       req.user = decoded; 
       next();
    } catch (err) {
@@ -23,7 +26,7 @@ function requireGuest(req, res, next) {
    }
    
    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'HEllODEVELOPER');
+      const decoded = jwt.verify(token, jwtSecret);
       req.user = decoded;
       return res.redirect('/user/dashboard');
    } catch (err) {

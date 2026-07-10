@@ -20,7 +20,9 @@ async function handleLogin(req, res) {
          return res.render('login',{error:"Invalid credentials",message:""})
       }
 
-      const token = jwt.sign({ id: user._id, email: user.Email, name: user.Name, role: user.Role }, process.env.JWT_SECRET || "HEllODEVELOPER",{expiresIn:'10d'})
+      const cleanEnv = (val) => typeof val === 'string' ? val.replace(/^["']|["']$/g, '') : val;
+      const jwtSecret = cleanEnv(process.env.JWT_SECRET) || "HEllODEVELOPER";
+      const token = jwt.sign({ id: user._id, email: user.Email, name: user.Name, role: user.Role }, jwtSecret,{expiresIn:'10d'})
       res.cookie('jwt',token,{maxAge: 10 * 24 * 60 * 60 * 1000, httpOnly: true})
       req.user = user;
       res.redirect('/user/dashboard')

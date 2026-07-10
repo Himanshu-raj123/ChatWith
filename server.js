@@ -19,7 +19,10 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(cookieParser())
 
-connectMongodb(process.env.MONGO_URL || process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/Chatwith')
+const cleanEnv = (val) => typeof val === 'string' ? val.replace(/^["']|["']$/g, '') : val;
+const dbUrl = cleanEnv(process.env.MONGO_URL) || cleanEnv(process.env.MONGO_URI) || 'mongodb://127.0.0.1:27017/Chatwith';
+
+connectMongodb(dbUrl)
    .then(async (res) => {
       console.log("Mongodb Server Connected Successfully");
       try {
