@@ -109,7 +109,7 @@ async function sendWelcomeEmail(toEmail, toName) {
             <p>Welcome to ChatWith! Your account has been created successfully. We're thrilled to have you join our community.</p>
             <p>You can now connect instantly with your friends in real-time, or chat with <strong>Swayam</strong>, our smart AI assistant powered by Groq.</p>
             <div style="text-align: center; margin: 35px 0;">
-              <a href="${process.env.APP_URL || 'http://localhost:4000'}" class="btn">Launch ChatWith</a>
+              <a href="${process.env.APP_URL}"class="btn">Launch ChatWith</a>
             </div>
             <p>If you have any questions or need support, simply reply to this email.</p>
             <p>Cheers,<br>The ChatWith Team</p>
