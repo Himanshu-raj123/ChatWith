@@ -543,3 +543,141 @@ body {
 .msg-content h1 { font-size: 1.2rem; }
 .msg-content h2 { font-size: 1.1rem; }
 .msg-content h3 { font-size: 1.0rem; }
+
+/* ========== SETTINGS MODAL STYLING ========== */
+.modal {
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   background: rgba(15, 23, 42, 0.4);
+   backdrop-filter: blur(4px);
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   z-index: 2000;
+   animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+   background: #ffffff;
+   border-radius: 20px;
+   width: 100%;
+   max-width: 460px;
+   box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
+   border: 1px solid #e2e8f0;
+   overflow: hidden;
+   animation: slideUp 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-header {
+   padding: 20px 24px;
+   border-bottom: 1px solid #e2e8f0;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+}
+
+.modal-header h2 {
+   font-size: 1.3rem;
+   font-weight: 700;
+   color: #0f172a;
+}
+
+.close-modal-btn {
+   font-size: 1.8rem;
+   font-weight: 500;
+   color: #64748b;
+   cursor: pointer;
+   transition: color 0.2s;
+   line-height: 1;
+}
+
+.close-modal-btn:hover {
+   color: #0f172a;
+}
+
+.modal-body {
+   padding: 24px;
+}
+
+.modal-body .input-group {
+   margin-bottom: 16px;
+   display: flex;
+   flex-direction: column;
+   gap: 6px;
+}
+
+.modal-body .input-group label {
+   font-size: 0.85rem;
+   font-weight: 600;
+   color: #475569;
+}
+
+.modal-body .input-group label i {
+   color: #4f46e5;
+   margin-right: 4px;
+}
+
+.modal-body .input-group input {
+   width: 100%;
+   padding: 10px 14px;
+   border: 1px solid #e2e8f0;
+   border-radius: 10px;
+   font-size: 0.9rem;
+   color: #0f172a;
+   background: #f8fafc;
+   transition: all 0.2s;
+}
+
+.modal-body .input-group input:focus {
+   border-color: #4f46e5;
+   background: #ffffff;
+   outline: none;
+   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.danger-zone h3 {
+   font-size: 1rem;
+   color: #dc2626;
+   font-weight: 700;
+   margin-bottom: 6px;
+}
+
+.danger-zone p {
+   font-size: 0.85rem;
+   color: #64748b;
+   margin-bottom: 12px;
+}
+
+.delete-btn {
+   background: rgba(239, 68, 68, 0.08);
+   color: #dc2626;
+   border: 1px solid rgba(239, 68, 68, 0.15);
+   padding: 10px 16px;
+   border-radius: 10px;
+   font-size: 0.9rem;
+   font-weight: 600;
+   cursor: pointer;
+   transition: all 0.2s;
+   display: inline-flex;
+   align-items: center;
+   gap: 6px;
+}
+
+.delete-btn:hover {
+   background: #dc2626;
+   color: #ffffff;
+   border-color: #dc2626;
+}
+
+@keyframes fadeIn {
+   from { opacity: 0; }
+   to { opacity: 1; }
+}
+
+@keyframes slideUp {
+   from { transform: translateY(20px); opacity: 0; }
+   to { transform: translateY(0); opacity: 1; }
+}
