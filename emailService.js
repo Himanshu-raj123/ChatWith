@@ -1,12 +1,18 @@
 const nodemailer = require('nodemailer');
+const axios = require('axios');
 
 const cleanEnv = (val) => typeof val === 'string' ? val.replace(/^["']|["']$/g, '') : val;
 
+// API configuration
+const brevoApiKey = cleanEnv(process.env.BREVO_API_KEY);
+
+// SMTP configuration
 const smtpHost = cleanEnv(process.env.SMTP_HOST) || 'smtp.gmail.com';
 const smtpPort = parseInt(cleanEnv(process.env.SMTP_PORT) || '465');
 const smtpSecure = cleanEnv(process.env.SMTP_SECURE) !== 'false';
-const smtpUser = cleanEnv(process.env.SMTP_USER);
+const smtpUser = cleanEnv(process.env.SMTP_USER) || 'hraj13085@gmail.com';
 const smtpPass = cleanEnv(process.env.SMTP_PASS);
+const appUrl = cleanEnv(process.env.APP_URL) || 'http://localhost:4000';
 
 // Create reusable transporter object using SMTP transport
 const transporter = nodemailer.createTransport({
@@ -26,117 +32,150 @@ const transporter = nodemailer.createTransport({
  * @returns {Promise<boolean>}
  */
 async function sendWelcomeEmail(toEmail, toName) {
-  // Check if SMTP is configured
+  const subject = "Welcome to ChatWith! 🚀";
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background-color: #f8fafc;
+          color: #334155;
+          margin: 0;
+          padding: 0;
+        }
+        .container {
+          max-width: 600px;
+          margin: 40px auto;
+          background-color: #ffffff;
+          border-radius: 16px;
+          box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+          border: 1px solid #e2e8f0;
+          overflow: hidden;
+        }
+        .header {
+          background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+          padding: 40px 20px;
+          text-align: center;
+          color: #ffffff;
+        }
+        .header h1 {
+          margin: 0;
+          font-size: 28px;
+          font-weight: 800;
+          letter-spacing: -0.5px;
+        }
+        .content {
+          padding: 40px 30px;
+          line-height: 1.6;
+        }
+        .content h2 {
+          color: #0f172a;
+          font-size: 20px;
+          margin-top: 0;
+          font-weight: 700;
+        }
+        .content p {
+          font-size: 16px;
+          color: #475569;
+          margin-bottom: 24px;
+        }
+        .btn {
+          display: inline-block;
+          background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+          color: #ffffff !important;
+          text-decoration: none;
+          padding: 12px 30px;
+          border-radius: 12px;
+          font-weight: 600;
+          font-size: 16px;
+          box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+          text-align: center;
+        }
+        .footer {
+          background-color: #f8fafc;
+          padding: 20px 30px;
+          border-top: 1px solid #e2e8f0;
+          text-align: center;
+          font-size: 14px;
+          color: #94a3b8;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>ChatWith</h1>
+        </div>
+        <div class="content">
+          <h2>Hi ${toName},</h2>
+          <p>Welcome to ChatWith! Your account has been created successfully. We're thrilled to have you join our community.</p>
+          <p>You can now connect instantly with your friends in real-time, or chat with <strong>Swayam</strong>, our smart AI assistant powered by Groq.</p>
+          <div style="text-align: center; margin: 35px 0;">
+            <a href="${appUrl}" class="btn">Launch ChatWith</a>
+          </div>
+          <p>If you have any questions or need support, simply reply to this email.</p>
+          <p>Cheers,<br>The ChatWith Team</p>
+        </div>
+        <div class="footer">
+          <p>&copy; 2026 ChatWith. All rights reserved.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  // 1. If BREVO_API_KEY is configured, send via Brevo HTTPS API (Always works on Railway)
+  if (brevoApiKey) {
+    try {
+      await axios.post('https://api.brevo.com/v3/smtp/email', {
+        sender: {
+          name: "ChatWith Team",
+          email: smtpUser
+        },
+        to: [
+          {
+            email: toEmail,
+            name: toName
+          }
+        ],
+        subject: subject,
+        htmlContent: htmlContent
+      }, {
+        headers: {
+          'api-key': brevoApiKey,
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log(`Welcome email successfully sent to ${toEmail} via Brevo HTTP API`);
+      return true;
+    } catch (error) {
+      console.error(`Failed to send welcome email via Brevo:`, error.response ? error.response.data : error.message);
+      // Fall through to SMTP fallback if Brevo fails
+    }
+  }
+
+  // 2. Fallback to standard SMTP (Gmail/etc)
   if (!smtpUser || !smtpPass) {
-    console.warn("SMTP credentials (SMTP_USER, SMTP_PASS) not configured. Skipping welcome email.");
+    console.warn("SMTP/Brevo credentials not configured. Skipping welcome email.");
     return false;
   }
 
   const mailOptions = {
     from: `"ChatWith Team" <${smtpUser}>`,
     to: toEmail,
-    subject: "Welcome to ChatWith! 🚀",
-    html: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <style>
-          body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8fafc;
-            color: #334155;
-            margin: 0;
-            padding: 0;
-          }
-          .container {
-            max-width: 600px;
-            margin: 40px auto;
-            background-color: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
-            border: 1px solid #e2e8f0;
-            overflow: hidden;
-          }
-          .header {
-            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-            padding: 40px 20px;
-            text-align: center;
-            color: #ffffff;
-          }
-          .header h1 {
-            margin: 0;
-            font-size: 28px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-          }
-          .content {
-            padding: 40px 30px;
-            line-height: 1.6;
-          }
-          .content h2 {
-            color: #0f172a;
-            font-size: 20px;
-            margin-top: 0;
-            font-weight: 700;
-          }
-          .content p {
-            font-size: 16px;
-            color: #475569;
-            margin-bottom: 24px;
-          }
-          .btn {
-            display: inline-block;
-            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
-            color: #ffffff !important;
-            text-decoration: none;
-            padding: 12px 30px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 16px;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
-            text-align: center;
-          }
-          .footer {
-            background-color: #f8fafc;
-            padding: 20px 30px;
-            border-top: 1px solid #e2e8f0;
-            text-align: center;
-            font-size: 14px;
-            color: #94a3b8;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>ChatWith</h1>
-          </div>
-          <div class="content">
-            <h2>Hi ${toName},</h2>
-            <p>Welcome to ChatWith! Your account has been created successfully. We're thrilled to have you join our community.</p>
-            <p>You can now connect instantly with your friends in real-time, or chat with <strong>Swayam</strong>, our smart AI assistant powered by Groq.</p>
-            <div style="text-align: center; margin: 35px 0;">
-              <a href="${process.env.APP_URL}"class="btn">Launch ChatWith</a>
-            </div>
-            <p>If you have any questions or need support, simply reply to this email.</p>
-            <p>Cheers,<br>The ChatWith Team</p>
-          </div>
-          <div class="footer">
-            <p>&copy; 2026 ChatWith. All rights reserved.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `
+    subject: subject,
+    html: htmlContent
   };
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log(`Welcome email successfully sent to ${toEmail}`);
+    console.log(`Welcome email successfully sent to ${toEmail} via SMTP`);
     return true;
   } catch (error) {
-    console.error(`Failed to send welcome email to ${toEmail}:`, error);
+    console.error(`Failed to send welcome email via SMTP:`, error);
     return false;
   }
 }
