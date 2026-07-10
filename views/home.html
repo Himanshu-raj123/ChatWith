@@ -3,68 +3,73 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ChatWith - Instant Real-Time Messaging</title>
-  <link rel="stylesheet" href="home.css">
+  <title>ChatWith - Connect & Chat Instantly</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="home.css">
 </head>
 <body>
   <!-- Navbar -->
   <header>
     <nav class="navbar">
       <div class="logo">
-         <i class="fa-solid fa-comments"></i>
-         <span>ChatWith</span>
+        <i class="fa-solid fa-comments"></i>
+        <span>ChatWith</span>
       </div>
       <ul class="nav-links">
-        <li><a href="/user/login" class="nav-login">Log In</a></li>
-        <li><a href="/user/signup" class="btn primary">Sign Up</a></li>
+        <li><a href="user/login" class="nav-link">Login</a></li>
+        <li><a href="user/signup" class="btn primary-btn">Sign Up</a></li>
       </ul>
     </nav>
   </header>
 
   <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-content">
-      <h1>Stay Connected, <br>Instantly with <span>ChatWith</span></h1>
-      <p>Connect with your friends, collaborate in real-time, and experience intelligent conversations with Swayam, our built-in AI assistant.</p>
-      <div class="hero-buttons">
-        <a href="/user/signup" class="btn primary-large">🚀 Get Started For Free</a>
-        <a href="/user/login" class="btn secondary-large">Log In to Account</a>
+  <section class="hero-section">
+    <div class="hero-container">
+      <div class="hero-text">
+        <h1>Connect and chat with <span class="highlight">Swayam AI</span> & friends</h1>
+        <p>A fast, modern, and secure messaging platform. Chat instantly with other users or consult with Swayam, our intelligent AI assistant.</p>
+        <div class="hero-buttons">
+          <a href="/user/signup" class="btn primary-btn">🚀 Get Started</a>
+          <a href="/user/login" class="btn secondary-btn">Login to Account</a>
+        </div>
       </div>
-    </div>
-    <div class="hero-image">
-       <img src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?q=80&w=2000&auto=format&fit=crop" alt="Chat Connections">
+      <div class="hero-image">
+        <div class="image-wrapper">
+          <img src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?q=80&w=2000&auto=format&fit=crop" alt="Modern Chat Illustration">
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- Features Section -->
   <section class="features">
-    <h2>✨ Why Choose ChatWith?</h2>
+    <span class="sub-title">Core Features</span>
+    <h2>Designed for seamless conversations</h2>
     <div class="feature-grid">
       <div class="feature-card">
-        <div class="feature-icon"><i class="fa-solid fa-bolt"></i></div>
+        <div class="icon-box"><i class="fa-solid fa-paper-plane"></i></div>
         <h3>Instant Messaging</h3>
-        <p>Send and receive messages in real-time with zero latency and high reliability.</p>
+        <p>Send and receive messages in real-time with zero delays, driven by WebSocket technology.</p>
       </div>
       <div class="feature-card">
-        <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
-        <h3>Safe & Secure</h3>
-        <p>Your authentication is secure, and your private messages are kept safe in our database.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon"><i class="fa-solid fa-robot"></i></div>
+        <div class="icon-box purple"><i class="fa-solid fa-robot"></i></div>
         <h3>Swayam AI Assistant</h3>
-        <p>Chat directly with Swayam, a powerful LLM assistant designed to help answer your queries instantly.</p>
+        <p>Get answers, write code, or just chat with our built-in smart assistant powered by Groq.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon-box green"><i class="fa-solid fa-shield-halved"></i></div>
+        <h3>Secure Auth</h3>
+        <p>Your account and chats are protected with secure passwords and token authentication.</p>
       </div>
     </div>
   </section>
 
   <!-- Footer -->
   <footer>
-    <p>&copy; 2026 ChatWith. Made with ❤️ for real-time connection.</p>
+    <p>&copy; 2026 ChatWith. All rights reserved.</p>
   </footer>
 </body>
 </html>
