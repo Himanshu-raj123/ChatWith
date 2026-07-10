@@ -1,20 +1,25 @@
 const axios = require('axios');
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
-async function askGemini(prompt){
-  const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + GEMINI_API_KEY;
+async function askGroq(prompt){
+  const url = 'https://api.groq.com/openai/v1/chat/completions';
   try {
     const response = await axios.post(url, {
-      contents: [{ parts: [{ text: prompt }] }]
+      model: "llama-3.1-8b-instant",
+      messages: [{ role: "user", content: prompt }]
+    }, {
+      headers: {
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
     });
 
-    // Extract the AI's reply
-    return response.data.candidates[0].content.parts[0].text;
+    return response.data.choices[0].message.content;
   } catch (error) {
-    console.error('Gemini API error:', error.response?.data || error.message);
+    console.error('Groq API error:', error.response?.data || error.message);
     return 'Sorry, the AI agent is unavailable right now.';
   }
 }
 
-module.exports = { askGemini };
+module.exports = { askGroq };

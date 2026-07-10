@@ -3,7 +3,7 @@ const path = require('path')
 const router = express.Router();
 const { requireAuth, requireGuest, authorizeRoles } = require('../middlewares/auth')
 const {handleLogin,handleSignup,handleLogout} = require('../controllers/user')
-const {askGemini} = require('../aiService')
+const {askGroq} = require('../aiService')
 
 const Users = require('../models/users')
 
@@ -33,8 +33,7 @@ router.post('/askAi', async (req, res) => {
   // If the recipient is the AI agent
   if (recipient === 'AI' || recipient === 'Gemini') {
     try {
-      const aiReply = await askGemini(text);
-      // Send both user message and AI reply back to frontend
+      const aiReply = await askGroq(text);
       return res.json({
         userMessage: text,
         aiReply

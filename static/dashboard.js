@@ -16,6 +16,40 @@ function formatTime(timestamp) {
   return hours + ':' + minutes + ' ' + ampm;
 }
 
+function formatMessageContent(message, sender) {
+  if (sender === 'AI') {
+    if (typeof marked !== 'undefined') {
+      return marked.parse(message);
+    }
+  }
+  const escaped = message
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+  return escaped.replace(/\n/g, '<br>');
+}
+
+async function copyMessageText(button) {
+  const msgDiv = button.closest('.sent, .received');
+  const contentDiv = msgDiv.querySelector('.msg-content');
+  const textToCopy = contentDiv.innerText || contentDiv.textContent;
+  
+  try {
+    await navigator.clipboard.writeText(textToCopy);
+    const icon = button.querySelector('i');
+    icon.className = 'fa-solid fa-check';
+    button.style.color = '#22c55e';
+    setTimeout(() => {
+      icon.className = 'fa-regular fa-copy';
+      button.style.color = '';
+    }, 2000);
+  } catch (err) {
+    console.error('Failed to copy text: ', err);
+  }
+}
+
 // Register active user
 socket.emit("active", loggedInUserEmail, loggedInUserName);
 
@@ -32,8 +66,9 @@ chatForm.addEventListener('submit', (event) => {
     let div = document.createElement('div');
     div.setAttribute('class', 'sent');
     div.innerHTML = `
-        <div class="msg-content">${inputMessage}</div>
+        <div class="msg-content">${formatMessageContent(inputMessage, loggedInUserEmail)}</div>
         <div class="msg-meta">
+           <span class="msg-copy" onclick="copyMessageText(this)" title="Copy message"><i class="fa-regular fa-copy"></i></span>
            <span class="msg-time">${formatTime(new Date())}</span>
            <span class="msg-status"><i class="fa-solid fa-check"></i></span>
         </div>
@@ -57,8 +92,9 @@ socket.on("privateMessage", (msgData) => {
     let div = document.createElement('div');
     div.setAttribute('class', 'received');
     div.innerHTML = `
-        <div class="msg-content">${msgData.message}</div>
+        <div class="msg-content">${formatMessageContent(msgData.message, msgData.sender)}</div>
         <div class="msg-meta">
+           <span class="msg-copy" onclick="copyMessageText(this)" title="Copy message"><i class="fa-regular fa-copy"></i></span>
            <span class="msg-time">${formatTime(msgData.timestamp)}</span>
         </div>
     `;
@@ -162,8 +198,9 @@ function setupChatSwitch(card) {
         <div id="chat-messages">
            ${chatHistory.map(msg => `
               <div class="${msg.sender === loggedInUserEmail ? 'sent' : 'received'}">
-                 <div class="msg-content">${msg.message}</div>
+                 <div class="msg-content">${formatMessageContent(msg.message, msg.sender)}</div>
                  <div class="msg-meta">
+                    <span class="msg-copy" onclick="copyMessageText(this)" title="Copy message"><i class="fa-regular fa-copy"></i></span>
                     <span class="msg-time">${formatTime(msg.timestamp)}</span>
                     ${msg.sender === loggedInUserEmail ? 
                        `<span class="msg-status"><i class="fa-solid ${msg.seen ? 'fa-check-double' : 'fa-check'}"></i></span>` 
@@ -198,8 +235,9 @@ function setupChatSwitch(card) {
         let div = document.createElement('div');
         div.setAttribute('class', 'sent');
         div.innerHTML = `
-            <div class="msg-content">${inputMessage}</div>
+            <div class="msg-content">${formatMessageContent(inputMessage, loggedInUserEmail)}</div>
             <div class="msg-meta">
+               <span class="msg-copy" onclick="copyMessageText(this)" title="Copy message"><i class="fa-regular fa-copy"></i></span>
                <span class="msg-time">${formatTime(new Date())}</span>
                <span class="msg-status"><i class="fa-solid fa-check"></i></span>
             </div>
