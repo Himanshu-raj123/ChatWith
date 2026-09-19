@@ -5,14 +5,12 @@ const jwtSecret = cleanEnv(process.env.JWT_SECRET) || 'HEllODEVELOPER';
 
 function requireAuth(req, res, next) {
    const token = req.cookies.jwt;
-   if (!token){
-      return res.redirect('/user/login');
-   }
+   if (!token)return res.redirect('/user/login');
    try {
       const decoded = jwt.verify(token, jwtSecret);
       req.user = decoded; 
       next();
-   } catch (err) {
+   } catch (err){
       res.clearCookie('jwt');
       return res.redirect('/user/login');
    }
@@ -20,11 +18,7 @@ function requireAuth(req, res, next) {
 
 function requireGuest(req, res, next) {
    const token = req.cookies.jwt;
-
-   if (!token) {
-      return next();
-   }
-   
+   if (!token) return next();
    try {
       const decoded = jwt.verify(token, jwtSecret);
       req.user = decoded;
@@ -33,6 +27,7 @@ function requireGuest(req, res, next) {
       res.clearCookie('jwt');
       return next();
    }
+
 }
 
 // Authorization middleware
@@ -41,11 +36,11 @@ function authorizeRoles(...allowedRoles) {
       if (!req.user || !req.user.role) {
          return res.status(403).send("Forbidden: User role not found");
       }
-      
+
       if (!allowedRoles.includes(req.user.role)) {
          return res.status(403).send("Forbidden: You don't have permission to perform this action");
       }
-      
+
       next();
    };
 }

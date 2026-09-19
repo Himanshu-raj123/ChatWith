@@ -121,8 +121,11 @@ io.on('connection', (socket) => {
 
 
 const PORT = process.env.PORT || 4000;
-server.listen(PORT, (err) => {
-   console.log(err ? "Error in starting the server" : `Server started at http://localhost:${PORT}/`)
-})
+server.listen(PORT, '0.0.0.0', () => {
+   console.log(`Server started at http://localhost:${PORT}/`);
+});
+server.on('error', (err) => {
+   console.error("Server listen error:", err);
+});
 
 module.exports = { io, activeUsers };
