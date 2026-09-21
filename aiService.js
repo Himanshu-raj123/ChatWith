@@ -1,23 +1,38 @@
 const axios = require('axios');
+require('dotenv').config();
 
-const cleanEnv = (val) => (typeof val === 'string' ? val.replace(/^["']|["']$/g, '').trim() : val);
+const cleanEnv = (val) => (typeof val === 'string' ? val.trim().replace(/^["']|["']$/g, '') : val);
 
-const CANDIDATE_MODELS = [
-  'qwen/qwen3.8-27b',
-  'openai/gpt-oss-120b',
-  'openai/gpt-oss-20b'
-];
+// Supported active production models on Groq (with fallback order)
+const DEFAULT_MODELS = ['openai/gpt-oss-20b', 'openai/gpt-oss-120b', 'qwen/qwen3.8-27b'];
 
 async function askGroq(prompt) {
   const apiKey = cleanEnv(process.env.GROQ_API_KEY);
   if (!apiKey) {
-    console.error("GROQ_API_KEY is not configured in environment variables.");
-    return "Sorry, the AI agent is not configured properly (missing API key).";
+    console.error('Groq API error: GROQ_API_KEY is not set in environment variables or .env');
+    return 'Sorry, the AI agent is not configured properly (missing API key).';
   }
 
+  const preferredModel = cleanEnv(process.env.GROQ_MODEL);
+  const modelsToTry = [
+    ...(preferredModel ? [preferredModel] : []),
+    ...DEFAULT_MODELS.filter((m) => m !== preferredModel)
+  ];
+
   const url = 'https://api.groq.com/openai/v1/chat/completions';
-  const selectedModel = cleanEnv(process.env.GROQ_MODEL) || CANDIDATE_MODELS[0];
-  const modelsToTry = [selectedModel, ...CANDIDATE_MODELS.filter(m => m !== selectedModel)];
+  const messages = [
+    {
+      role: 'system',
+      content:
+        'You are Swayam, a friendly, intelligent, and helpful AI assistant for the ChatWith messaging platform. Keep your answers concise, clear, and engaging.'
+    },
+    {
+      role: 'user',
+      content: prompt
+    }
+  ];
+
+  let lastError = null;
 
   for (const model of modelsToTry) {
     try {
@@ -25,31 +40,27 @@ async function askGroq(prompt) {
         url,
         {
           model: model,
-          messages: [
-            {
-              role: 'system',
-              content: 'You are Swayam, a friendly, intelligent, and helpful AI assistant for the ChatWith platform.'
-            },
-            {
-              role: 'user',
-              content: prompt
-            }
-          ]
+          messages: messages,
+          reasoning_format: 'hidden'
         },
         {
           headers: {
-            Authorization: `Bearer ${apiKey}`,
+            'Authorization': `Bearer ${apiKey}`,
             'Content-Type': 'application/json'
           },
-          timeout: 20000
+          timeout: 25000
         }
       );
 
-      return response.data.choices[0].message.content;
+      let content = response.data?.choices?.[0]?.message?.content;
+      if (content) {
+        // Strip out any raw thinking tags if returned
+        content = content.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+        return content;
+      }
     } catch (error) {
-      console.error(`Groq API error with model [${model}]:`, error.response?.data || error.message);
-      // Try next model if model not found or decommissioned
-      continue;
+      lastError = error;
+      console.error(`Groq API error with model '${model}':`, error.response?.data || error.message);
     }
   }
 

@@ -1,6 +1,12 @@
 const socket = io();
 let activeUSers;
 
+function generateMongoId() {
+  const timestamp = Math.floor(Date.now() / 1000).toString(16).padStart(8, '0');
+  const random = 'xxxxxxxxxxxxxxxx'.replace(/[x]/g, () => Math.floor(Math.random() * 16).toString(16));
+  return timestamp + random;
+}
+
 function formatTime(timestamp) {
   if (!timestamp) return '';
   const date = new Date(timestamp);
@@ -65,12 +71,22 @@ socket.on("privateMessage", (msgData) => {
   // Show only if current chat is with the sender
   if (activeChat && activeChat.innerText === sender && loggedInUserEmail != sender) {
     let chatbox = document.getElementById('chat-messages');
+
+    // Remove AI typing indicator if present
+    const typingIndicator = document.getElementById('ai-typing-indicator');
+    if (typingIndicator) {
+      typingIndicator.remove();
+    }
+
     let div = document.createElement('div');
     div.setAttribute('class', 'received' + (sender === 'AI' ? ' ai-message' : ''));
+    if (msgData._id) div.setAttribute('data-msg-id', msgData._id);
+    div.setAttribute('data-sender', msgData.sender);
     div.innerHTML = `
         <div class="msg-content">${formatMessageContent(msgData.message, msgData.sender)}</div>
         <div class="msg-meta">
            <span class="msg-copy" title="Copy message"><i class="fa-regular fa-copy"></i></span>
+           <span class="msg-delete" title="Delete message"><i class="fa-regular fa-trash-can"></i></span>
            <span class="msg-time">${formatTime(msgData.timestamp)}</span>
         </div>
     `;
@@ -168,20 +184,21 @@ function setupChatSwitch(card) {
     id2.innerHTML = `
         <div id="user">
           <button id="mobile-back-btn" class="mobile-back" title="Back to users"><i class="fa-solid fa-arrow-left"></i></button>
-          <div><i class="fa-solid fa-user"></i></div>
+          <div><i class="${selectedEmail === 'AI' ? 'fa-solid fa-robot' : 'fa-solid fa-user'}"></i></div>
           <div>
             <span id="reciverEmail" style="display:none;">${selectedEmail}</span>
             <span style="font-weight: 600; font-size: 1.1rem; color: #0f172a;">${selectedName}</span><br>
-            <span style="font-size: 0.85rem; color: #64748b;">${selectedEmail}</span>
+            <span style="font-size: 0.85rem; color: #64748b;">${selectedEmail === 'AI' ? 'AI Assistant (Swayam)' : selectedEmail}</span>
           </div>
         </div>
 
         <div id="chat-messages">
            ${chatHistory.map(msg => `
-              <div class="${msg.sender === loggedInUserEmail ? 'sent' : (msg.sender === 'AI' ? 'received ai-message' : 'received')}">
+              <div class="${msg.sender === loggedInUserEmail ? 'sent' : (msg.sender === 'AI' ? 'received ai-message' : 'received')}" data-msg-id="${msg._id || ''}" data-sender="${msg.sender}">
                  <div class="msg-content">${formatMessageContent(msg.message, msg.sender)}</div>
                  <div class="msg-meta">
                     <span class="msg-copy" title="Copy message"><i class="fa-regular fa-copy"></i></span>
+                    <span class="msg-delete" title="Delete message"><i class="fa-regular fa-trash-can"></i></span>
                     <span class="msg-time">${formatTime(msg.timestamp)}</span>
                     ${msg.sender === loggedInUserEmail ? 
                        `<span class="msg-status"><i class="fa-solid ${msg.seen ? 'fa-check-double' : 'fa-check'}"></i></span>` 
@@ -218,21 +235,42 @@ function setupChatSwitch(card) {
       event.preventDefault();
       const inputMessage = input.value.trim();
       if (inputMessage) {
-        socket.emit("privateMessage", inputMessage, loggedInUserEmail, selectedEmail);
+        const clientMsgId = generateMongoId();
+        socket.emit("privateMessage", inputMessage, loggedInUserEmail, selectedEmail, clientMsgId);
 
         // Show message immediately
         let chatbox = document.getElementById('chat-messages');
         let div = document.createElement('div');
         div.setAttribute('class', 'sent');
+        div.setAttribute('data-msg-id', clientMsgId);
+        div.setAttribute('data-sender', loggedInUserEmail);
         div.innerHTML = `
             <div class="msg-content">${formatMessageContent(inputMessage, loggedInUserEmail)}</div>
             <div class="msg-meta">
                <span class="msg-copy" title="Copy message"><i class="fa-regular fa-copy"></i></span>
+               <span class="msg-delete" title="Delete message"><i class="fa-regular fa-trash-can"></i></span>
                <span class="msg-time">${formatTime(new Date())}</span>
                <span class="msg-status"><i class="fa-solid fa-check"></i></span>
             </div>
         `;
         chatbox.appendChild(div);
+
+        // If chatting with AI, show temporary typing bubble
+        if (selectedEmail === 'AI') {
+          const oldTyping = document.getElementById('ai-typing-indicator');
+          if (oldTyping) oldTyping.remove();
+
+          const typingDiv = document.createElement('div');
+          typingDiv.id = 'ai-typing-indicator';
+          typingDiv.className = 'received ai-message typing-indicator-bubble';
+          typingDiv.innerHTML = `
+            <div class="msg-content" style="color: #64748b; font-style: italic; display: flex; align-items: center; gap: 8px;">
+               <i class="fa-solid fa-spinner fa-spin"></i> Swayam is thinking...
+            </div>
+          `;
+          chatbox.appendChild(typingDiv);
+        }
+
         chatbox.scrollTop = chatbox.scrollHeight; // keep scrolled down
 
         input.value = "";
@@ -325,3 +363,144 @@ if (confirmDeleteBtn) {
       }
    });
 }
+
+// ========== MESSAGE DELETION LOGIC ==========
+let currentDeleteTarget = {
+  messageId: null,
+  sender: null,
+  element: null
+};
+
+// Event delegation for delete icon click on messages
+document.addEventListener('click', (event) => {
+  const deleteBtn = event.target.closest('.msg-delete');
+  if (deleteBtn) {
+    const msgDiv = deleteBtn.closest('.sent, .received');
+    if (!msgDiv) return;
+
+    const msgId = msgDiv.getAttribute('data-msg-id');
+    const msgSender = msgDiv.getAttribute('data-sender');
+
+    currentDeleteTarget = {
+      messageId: msgId,
+      sender: msgSender,
+      element: msgDiv
+    };
+
+    openMsgDeleteModal(msgSender);
+  }
+});
+
+function openMsgDeleteModal(msgSender) {
+  const modal = document.getElementById('delete-message-modal');
+  const btnDeleteEveryone = document.getElementById('btn-delete-everyone');
+  const prompt = document.getElementById('msg-delete-prompt');
+  const activeChat = document.getElementById('reciverEmail');
+  const currentReceiver = activeChat ? activeChat.innerText : null;
+
+  if (modal) {
+    if (msgSender === loggedInUserEmail && currentReceiver !== 'AI') {
+      if (btnDeleteEveryone) btnDeleteEveryone.style.display = 'flex';
+      if (prompt) prompt.innerText = 'You can delete this message for everyone in this chat or only for yourself.';
+    } else {
+      if (btnDeleteEveryone) btnDeleteEveryone.style.display = 'none';
+      if (prompt) prompt.innerText = 'This will remove the message only from your chat history.';
+    }
+    modal.style.display = 'flex';
+  }
+}
+
+function closeMsgDeleteModal() {
+  const modal = document.getElementById('delete-message-modal');
+  if (modal) modal.style.display = 'none';
+  currentDeleteTarget = { messageId: null, sender: null, element: null };
+}
+
+document.getElementById('close-msg-delete-btn')?.addEventListener('click', closeMsgDeleteModal);
+document.getElementById('btn-cancel-msg-delete')?.addEventListener('click', closeMsgDeleteModal);
+
+const msgDeleteModal = document.getElementById('delete-message-modal');
+if (msgDeleteModal) {
+  window.addEventListener('click', (e) => {
+    if (e.target === msgDeleteModal) {
+      closeMsgDeleteModal();
+    }
+  });
+}
+
+// Handle "Delete for me"
+document.getElementById('btn-delete-me')?.addEventListener('click', () => {
+  if (!currentDeleteTarget.messageId) {
+    closeMsgDeleteModal();
+    return;
+  }
+
+  const msgId = currentDeleteTarget.messageId;
+  const msgEl = currentDeleteTarget.element;
+
+  // Socket notification
+  socket.emit('deleteForMe', {
+    messageId: msgId,
+    userEmail: loggedInUserEmail
+  });
+
+  // REST API fallback
+  fetch('/message/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messageId: msgId, type: 'me' })
+  }).catch(() => {});
+
+  // Remove from UI with smooth fade
+  if (msgEl) {
+    msgEl.classList.add('message-deleting');
+    setTimeout(() => msgEl.remove(), 250);
+  }
+
+  closeMsgDeleteModal();
+});
+
+// Handle "Delete for everyone"
+document.getElementById('btn-delete-everyone')?.addEventListener('click', () => {
+  if (!currentDeleteTarget.messageId) {
+    closeMsgDeleteModal();
+    return;
+  }
+
+  const msgId = currentDeleteTarget.messageId;
+  const msgEl = currentDeleteTarget.element;
+  const activeChat = document.getElementById('reciverEmail');
+  const currentReceiver = activeChat ? activeChat.innerText : null;
+
+  // Socket notification
+  socket.emit('deleteForEveryone', {
+    messageId: msgId,
+    sender: loggedInUserEmail,
+    receiver: currentReceiver
+  });
+
+  // REST API fallback
+  fetch('/message/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messageId: msgId, type: 'everyone', receiver: currentReceiver })
+  }).catch(() => {});
+
+  // Remove from UI with smooth fade
+  if (msgEl) {
+    msgEl.classList.add('message-deleting');
+    setTimeout(() => msgEl.remove(), 250);
+  }
+
+  closeMsgDeleteModal();
+});
+
+// Real-time messageDeleted listener
+socket.on('messageDeleted', ({ messageId }) => {
+  if (!messageId) return;
+  const target = document.querySelector(`[data-msg-id="${messageId}"]`);
+  if (target) {
+    target.classList.add('message-deleting');
+    setTimeout(() => target.remove(), 250);
+  }
+});

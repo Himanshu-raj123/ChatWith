@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema({
    },
    messages: [
       {
+         _id: { type: mongoose.Schema.Types.ObjectId, default: () => new mongoose.Types.ObjectId() },
          sender: String,
          receiver: String,
          message: String,
